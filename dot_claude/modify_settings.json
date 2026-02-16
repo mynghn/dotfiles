@@ -1,0 +1,16 @@
+#!/bin/sh
+
+
+input=$(cat)
+
+if [ -z "$input" ]; then
+  input='{}'
+fi
+
+echo "$input" | jq '
+  .statusLine = {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  } |
+  .enabledPlugins["mgrep@Mixedbread-Grep"] = true
+'
