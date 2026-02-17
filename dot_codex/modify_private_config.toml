@@ -1,0 +1,46 @@
+#!/bin/sh
+set -eu
+
+input=$(cat || true)
+
+printf '%s\n' "$input" | awk '
+BEGIN {
+  skip_mcp_section = 0
+}
+
+/^[[:space:]]*\[\[mcp_servers(\.[^]]+)?\]\][[:space:]]*$/ {
+  skip_mcp_section = 1
+  next
+}
+
+/^[[:space:]]*\[mcp_servers(\.[^]]+)?\][[:space:]]*$/ {
+  skip_mcp_section = 1
+  next
+}
+
+/^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
+  skip_mcp_section = 0
+  print
+  next
+}
+
+{
+  if (!skip_mcp_section) {
+    print
+  }
+}
+
+END {
+  if (NR > 0) {
+    print ""
+  }
+
+  print "[mcp_servers.mgrep]"
+  print "command = \"mgrep\""
+  print "args = [\"mcp\"]"
+  print ""
+  print "[mcp_servers.context7]"
+  print "command = \"npx\""
+  print "args = [\"-y\", \"@upstash/context7-mcp\"]"
+}
+'
