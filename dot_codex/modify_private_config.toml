@@ -5,27 +5,22 @@ input=$(cat || true)
 
 printf '%s\n' "$input" | awk '
 BEGIN {
-  skip_mcp_section = 0
-}
-
-/^[[:space:]]*\[\[mcp_servers(\.[^]]+)?\]\][[:space:]]*$/ {
-  skip_mcp_section = 1
-  next
-}
-
-/^[[:space:]]*\[mcp_servers(\.[^]]+)?\][[:space:]]*$/ {
-  skip_mcp_section = 1
-  next
+  skip_managed_mcp_section = 0
 }
 
 /^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
-  skip_mcp_section = 0
+  if ($0 ~ /^[[:space:]]*\[mcp_servers\.(mgrep|context7)\][[:space:]]*$/) {
+    skip_managed_mcp_section = 1
+    next
+  }
+
+  skip_managed_mcp_section = 0
   print
   next
 }
 
 {
-  if (!skip_mcp_section) {
+  if (!skip_managed_mcp_section) {
     print
   }
 }
@@ -35,6 +30,7 @@ END {
     print ""
   }
 
+  print "# chezmoi-managed MCP servers"
   print "[mcp_servers.mgrep]"
   print "command = \"mgrep\""
   print "args = [\"mcp\"]"
