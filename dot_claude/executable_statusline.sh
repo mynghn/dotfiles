@@ -27,13 +27,14 @@ G='\033[32m'
 Y='\033[33m'
 B='\033[34m'
 M='\033[35m'
+O='\033[38;5;208m'
 D='\033[90m'
 
 # Separator
 S=" ${D}│${R} "
 
 # Build output
-out="${C}👤 ${USER:-$(whoami)}${R}"
+out="${B}user:${USER:-$(whoami)}${R}"
 
 # Directory (abbreviate home as ~, smart truncation)
 if [ "$cwd" = "$HOME" ]; then
@@ -77,7 +78,7 @@ if [ ${#dir} -gt 30 ]; then
         dir="$result"
     fi
 fi
-out+="${S}${B}📁 ${dir}${R}"
+out+="${S}${C}cwd:${dir}${R}"
 
 # Git branch (only if .git exists - fast check)
 if [ -d "${cwd}/.git" ] || [ -d "${project_dir}/.git" ]; then
@@ -86,33 +87,32 @@ if [ -d "${cwd}/.git" ] || [ -d "${project_dir}/.git" ]; then
     if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
         # Truncate branch name if > 30 chars
         [ ${#branch} -gt 30 ] && branch="${branch:0:29}…"
-        out+="${S}${G}🔶 ${branch}${R}"
+        out+="${S}${C}git:${branch}${R}"
     fi
 fi
 
 # Model
-[ -n "$model" ] && out+="${S}${M}🤖 ${model}${R}"
-
+[ -n "$model" ] && out+="${S}${O}model:${model}${R}"
 # Context remaining
 if [ -n "$context_remaining" ] && [ "$context_remaining" != "null" ] && [ "$context_remaining" != "" ]; then
     ctx=${context_remaining%.*}
     if [ "$ctx" -ge 70 ] 2>/dev/null; then
-        out+="${S}${G}💭 ${ctx}%${R}"
+        out+="${S}${G}ctx:${ctx}%${R}"
     elif [ "$ctx" -ge 30 ] 2>/dev/null; then
-        out+="${S}${Y}💭 ${ctx}%${R}"
+        out+="${S}${Y}ctx:${ctx}%${R}"
     else
-        out+="${S}\033[31m💭 ${ctx}%${R}"
+        out+="${S}\033[31mctx:${ctx}%${R}"
     fi
 fi
 
 # AWS Profile
-[ -n "$AWS_PROFILE" ] && out+="${S}${Y}☁️  ${AWS_PROFILE}${R}"
+[ -n "$AWS_PROFILE" ] && out+="${S}${M}aws:${AWS_PROFILE}${R}"
 
 # Kubernetes context (check KUBECONFIG or default location)
 kubeconfig="${KUBECONFIG:-$HOME/.kube/config}"
 if [ -f "$kubeconfig" ]; then
     kctx=$(grep -m1 'current-context:' "$kubeconfig" 2>/dev/null | awk '{print $2}')
-    [ -n "$kctx" ] && [ "$kctx" != "docker-desktop" ] && out+="${S}${C}⎈ ${kctx}${R}"
+    [ -n "$kctx" ] && [ "$kctx" != "docker-desktop" ] && out+="${S}${M}k8s:${kctx}${R}"
 fi
 
 printf '%b\n' "$out"
