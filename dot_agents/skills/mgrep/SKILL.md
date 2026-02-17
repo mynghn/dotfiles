@@ -15,6 +15,19 @@ Use `mgrep` to search your local files. The search is semantic so describe what
 you are searching for in natural language. The results is the file path and the
 line range of the match.
 
+## Network-restricted Codex environments
+
+If `mgrep` fails with `Failed to search: fetch failed`, DNS errors, or similar
+network failures inside the sandbox:
+
+1. Retry the same `mgrep` command with `sandbox_permissions="require_escalated"`.
+2. Include a short `justification` question about running `mgrep` outside the sandbox.
+3. Set `prefix_rule` to `["mgrep"]` so users can persist approval only for `mgrep`.
+4. Do not request broad prefixes and do not enable global sandbox network access.
+
+If escalation is denied, ask the user to run `mgrep` locally and continue from
+those pasted results.
+
 ### Do
 
 ```bash
