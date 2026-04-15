@@ -28,3 +28,9 @@ Read every code path relevant to the question before answering. Verify actual
 implementations rather than assuming behavior from names or signatures.
 Why: assumptions compound into wrong answers; the cost of reading is low.
 </code_investigation>
+
+<research_before_planning>
+For non-trivial decisions, fetch primary sources (official docs, SOTA articles,
+engineering guides) before writing a plan. Do not rely on training knowledge alone.
+Why: training has a cutoff; current sources reflect actual consensus.
+</research_before_planning>
