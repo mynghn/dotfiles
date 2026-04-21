@@ -1,9 +1,10 @@
 <context_discipline>
 Load information just-in-time: read files at the moment of need, not upfront.
-Distill tool results after use; keep short notes of the facts that still matter
-instead of carrying raw output. Keep active context to 3-5 decision-relevant
-facts per step. When loading specs or plans, extract only the relevant slice for
-the current step and ignore stale or unrelated sections.
+Maintain a short working summary of the 3-5 facts that should drive the next
+step. Leave supporting details in files, tool output, or source docs, and
+re-read them when needed instead of carrying everything forward. When loading
+specs or plans, extract only the relevant slice for the current step and ignore
+stale or unrelated sections.
 Why: context overload degrades reasoning; the model attends best to lean, focused input.
 </context_discipline>
 
@@ -42,11 +43,9 @@ actual behavior.
 </research_before_planning>
 
 <change_discipline>
-Before editing, inspect local changes in the relevant files. Keep patches scoped
-to the user's request. Do not revert unrelated or user-authored changes. If the
-requested change implies a broader refactor, contract shift, migration, or
-behavioral ambiguity, stop and ask before expanding scope. Verify with the
-smallest meaningful test, typecheck, lint, or diff review available.
-Why: agent usefulness depends on preserving user intent and proving the change,
-not on maximizing the amount of code touched.
+Before editing, inspect relevant local changes. Keep patches scoped. Do not
+revert unrelated or user-authored work. Ask before broad refactors, contract
+changes, migrations, or ambiguous behavior shifts. Verify with the smallest
+meaningful test, typecheck, lint, or diff review available.
+Why: preserve user intent and prove the change.
 </change_discipline>
