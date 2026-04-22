@@ -14,5 +14,6 @@ echo "$input" | jq '
   } |
   .alwaysThinkingEnabled = true |
   .autoConnectIde = true |
+  .includeGitInstructions = false |
   .enabledPlugins["mgrep@Mixedbread-Grep"] = true
 '
