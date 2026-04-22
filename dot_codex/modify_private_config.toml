@@ -27,7 +27,6 @@ function insert_agent_defaults() {
   if (!inserted_agent_defaults) {
     emit("")
     emit("tool_output_token_limit = 20000")
-    emit("web_search = \"cached\"")
     emit("")
     inserted_agent_defaults = 1
   }
