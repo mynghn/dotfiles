@@ -6,42 +6,23 @@ input=$(cat || true)
 printf '%s\n' "$input" | awk '
 BEGIN {
   skip_managed_mcp_section = 0
-  inserted_agent_defaults = 0
   previous_blank = 0
-}
-
-function emit(line) {
-  if (line ~ /^[[:space:]]*$/) {
-    if (!previous_blank) {
-      print ""
-      previous_blank = 1
-    }
-    return
-  }
-
-  print line
-  previous_blank = 0
-}
-
-function insert_agent_defaults() {
-  if (!inserted_agent_defaults) {
-    emit("")
-    emit("tool_output_token_limit = 20000")
-    emit("")
-    inserted_agent_defaults = 1
-  }
+  in_section = 0
+  printed_any = 0
 }
 
 /^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
-  insert_agent_defaults()
-
   if ($0 ~ /^[[:space:]]*\[mcp_servers\.(mgrep|context7)\][[:space:]]*$/) {
     skip_managed_mcp_section = 1
+    in_section = 1
     next
   }
 
   skip_managed_mcp_section = 0
-  emit($0)
+  in_section = 1
+  print
+  previous_blank = 0
+  printed_any = 1
   next
 }
 
@@ -50,23 +31,30 @@ function insert_agent_defaults() {
     next
   }
 
-  if ($0 ~ /^[[:space:]]*tool_output_token_limit[[:space:]]*=/) {
-    next
-  }
-
-  if ($0 ~ /^[[:space:]]*web_search[[:space:]]*=/) {
+  if (!in_section && $0 ~ /^[[:space:]]*(model|model_reasoning_effort|tool_output_token_limit|web_search)[[:space:]]*=/) {
     next
   }
 
   if (!skip_managed_mcp_section) {
-    emit($0)
+    if ($0 ~ /^[[:space:]]*$/) {
+      if (printed_any && !previous_blank) {
+        print ""
+        previous_blank = 1
+      }
+      next
+    }
+
+    print
+    previous_blank = 0
+    printed_any = 1
   }
 }
 
 END {
-  insert_agent_defaults()
+  if (printed_any && !previous_blank) {
+    print ""
+  }
 
-  emit("")
   print "# chezmoi-managed MCP servers"
   print "[mcp_servers.mgrep]"
   print "command = \"mgrep\""
