@@ -14,8 +14,8 @@ echo "$input" | jq '
   } |
   .alwaysThinkingEnabled = true |
   # Disable built-in commit/PR instructions + git-status snapshot injection.
-  # The dynamic snapshot busts Anthropic prompt-cache prefix each turn that
-  # edits files. See ~/Desktop/include-git-instructions-rationale.md.
+  # The dynamic snapshot busts Anthropic prompt-cache prefix each turn
+  # that edits files.
   .includeGitInstructions = false |
   .enabledPlugins["mgrep@Mixedbread-Grep"] = true
 '
