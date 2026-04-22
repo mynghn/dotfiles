@@ -12,5 +12,7 @@ echo "$input" | jq '
     "type": "command",
     "command": "~/.claude/statusline.sh"
   } |
+  .alwaysThinkingEnabled = true |
+  .autoConnectIde = true |
   .enabledPlugins["mgrep@Mixedbread-Grep"] = true
 '
