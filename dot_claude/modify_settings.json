@@ -13,9 +13,9 @@ echo "$input" | jq '
     "command": "~/.claude/statusline.sh"
   } |
   .alwaysThinkingEnabled = true |
-  # Disable built-in commit/PR instructions + git-status snapshot injection.
-  # The dynamic snapshot busts Anthropic prompt-cache prefix each turn
-  # that edits files.
+  # Opt out of built-in commit/PR instructions + git-status snapshot.
+  # Static prompt reduction: ~2k tokens/session (Sonnet), ~5k (Opus 4.7).
+  # Measured on v2.1.117; no cache-prefix invalidation observed.
   .includeGitInstructions = false |
   .enabledPlugins["mgrep@Mixedbread-Grep"] = true
 '
