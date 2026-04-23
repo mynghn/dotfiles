@@ -14,7 +14,7 @@ echo "$input" | jq '
   } |
   .alwaysThinkingEnabled = true |
   # Opt out of built-in commit/PR instructions + git-status snapshot.
-  # Static prompt reduction: ~2k tokens/session (Sonnet), ~5k (Opus 4.7).
+  # Static prompt reduction: ~2k tokens/session (Sonnet), ~2.6k (Opus 4.7 xhigh).
   # Measured on v2.1.117; no cache-prefix invalidation observed.
   .includeGitInstructions = false |
   .enabledPlugins["mgrep@Mixedbread-Grep"] = true
