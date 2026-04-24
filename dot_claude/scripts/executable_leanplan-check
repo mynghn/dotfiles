@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# leanplan-check: run all three validators against <KEY>, aggregate exit.
+#
+# Usage: leanplan-check <KEY>
+# Exit:  max(child exits). 0 clean, 1 warn, 2 error.
+
+set -uo pipefail
+
+KEY="${1:?usage: leanplan-check <KEY>}"
+DIR="docs/features/$KEY"
+if [ ! -d "$DIR" ]; then
+    echo "error: $DIR not found" >&2
+    exit 2
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+status_label() {
+    case "$1" in
+        0) printf ok ;;
+        1) printf warn ;;
+        2) printf ERROR ;;
+        *) printf "exit:%s" "$1" ;;
+    esac
+}
+
+"$SCRIPT_DIR/leanplan-check-anchors"  "$KEY"; a=$?
+"$SCRIPT_DIR/leanplan-check-coverage" "$KEY"; c=$?
+"$SCRIPT_DIR/leanplan-check-drift"    "$KEY"; d=$?
+
+worst=0
+for ec in "$a" "$c" "$d"; do
+    [ "$ec" -gt "$worst" ] && worst="$ec"
+done
+
+printf 'leanplan-check %s: anchors=%s coverage=%s drift=%s\n' \
+    "$KEY" "$(status_label "$a")" "$(status_label "$c")" "$(status_label "$d")" >&2
+
+exit "$worst"

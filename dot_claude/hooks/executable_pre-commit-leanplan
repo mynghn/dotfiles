@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# LeanPlan pre-commit hook.
+#
+# Installation (per repo, one of):
+#   ln -s ~/.claude/hooks/pre-commit-leanplan  <repo>/.git/hooks/pre-commit
+# or, if you already have per-repo pre-commits, chain it by calling this script
+# from your existing hook.
+#
+# Behavior: warn mode by default (diagnostics on stderr, exit 0 — non-blocking).
+# Set LEANPLAN_STRICT=1 to propagate validator errors and block the commit.
+
+set -uo pipefail
+
+SCRIPT_DIR="$HOME/.claude/scripts"
+if [ ! -x "$SCRIPT_DIR/leanplan-check" ]; then
+    # Nothing to do; don't obstruct the commit.
+    exit 0
+fi
+
+# Pick up feature keys from staged feature-artifact paths.
+keys=$(git diff --cached --name-only --diff-filter=ACM \
+    | grep -E '^docs/features/[^/]+/.*\.md$' \
+    | awk -F/ '{ print $3 }' \
+    | sort -u)
+
+if [ -z "$keys" ]; then
+    exit 0
+fi
+
+worst=0
+for key in $keys; do
+    "$SCRIPT_DIR/leanplan-check" "$key"
+    ec=$?
+    [ "$ec" -gt "$worst" ] && worst=$ec
+done
+
+if [ "$worst" -eq 0 ]; then
+    exit 0
+fi
+
+if [ "${LEANPLAN_STRICT:-0}" = "1" ]; then
+    echo "leanplan pre-commit: errors above — blocking (strict mode)" >&2
+    exit "$worst"
+else
+    echo "leanplan pre-commit: diagnostics above — commit proceeds (set LEANPLAN_STRICT=1 to block)" >&2
+    exit 0
+fi

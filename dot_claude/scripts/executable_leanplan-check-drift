@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# leanplan-check-drift: regex-based surface scan for artifact drift.
+#
+#   requirement.md:  forbidden tech-stack names
+#   spec.md:         same forbidden names (specific stacks belong in DESIGN)
+#   task.md:         step-by-step edit patterns ("edit X at line N", etc.)
+#
+# Usage: leanplan-check-drift <KEY>
+# Exit:   0 clean / 1 warn / 2 strict (under LEANPLAN_STRICT=1)
+
+set -uo pipefail
+
+KEY="${1:?usage: leanplan-check-drift <KEY>}"
+DIR="docs/features/$KEY"
+strict="${LEANPLAN_STRICT:-0}"
+
+REQ="$DIR/requirement.md"
+SPEC="$DIR/spec.md"
+TASK="$DIR/task.md"
+
+# Forbidden specific tech-stack names (uses grep -w for whole-word match).
+forbid_tech='Kafka|Redis|Kotlin|Spring|gRPC|Postgres|PostgreSQL|MySQL|Flink|Kubernetes|Docker|MongoDB|DynamoDB|Elasticsearch'
+
+# Step-by-step edit patterns (prohibited in task.md).
+step_patterns='edit .* at line [0-9]+|add line [0-9]+|change line [0-9]+|replace line [0-9]+|insert .* at line [0-9]+'
+
+warnings=0
+
+report_hit() {
+    local hit="$1" label="$2"
+    local src="${hit%%:*}"
+    local rest="${hit#*:}"
+    local lineno="${rest%%:*}"
+    local content="${rest#*:}"
+    printf '%s:%s: warn drift — %s: %s\n' "$src" "$lineno" "$label" "$content" >&2
+    warnings=$((warnings + 1))
+}
+
+if [ -f "$REQ" ]; then
+    while IFS= read -r hit; do
+        [ -z "$hit" ] && continue
+        report_hit "$hit" "tech-stack name in requirement.md"
+    done < <(grep -EwHn "$forbid_tech" "$REQ" 2>/dev/null || true)
+fi
+
+if [ -f "$SPEC" ]; then
+    while IFS= read -r hit; do
+        [ -z "$hit" ] && continue
+        report_hit "$hit" "specific-stack name in spec.md (use generic category)"
+    done < <(grep -EwHn "$forbid_tech" "$SPEC" 2>/dev/null || true)
+fi
+
+if [ -f "$TASK" ]; then
+    while IFS= read -r hit; do
+        [ -z "$hit" ] && continue
+        report_hit "$hit" "step-by-step edit instruction in task.md"
+    done < <(grep -iEHn "$step_patterns" "$TASK" 2>/dev/null || true)
+fi
+
+if [ "$warnings" -eq 0 ]; then
+    exit 0
+fi
+
+if [ "$strict" = "1" ]; then
+    exit 2
+else
+    exit 1
+fi
