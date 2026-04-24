@@ -72,7 +72,7 @@ Schemas, interfaces, signatures fold inline here when the decision involves them
 - **Schemas fold into Decisions.** No top-level `## Schemas` or `## Interfaces` section. The diagram + per-decision blocks carry structure.
 - **Architecture is mandatory.** Even a trivial one-component feature gets a diagram — it forces clarity about boundaries.
 - **Non-trivial decisions anchor to RATIONALE.** Trivial decisions stay inline with a one-line why. A decision with *no* real alternative isn't a decision — fold its content into the diagram or reference the SPEC Invariant it satisfies.
-- **No duplicate Invariants.** If SPEC says "must be non-blocking", DESIGN doesn't re-state it. Reference the SPEC anchor if a Decision is derived from it (e.g. "satisfies SPEC#AC-3-non-blocking-handover").
+- **No duplicate Invariants.** If SPEC says "must be non-blocking", DESIGN doesn't re-state it. Reference the SPEC anchor if a Decision is derived from it (e.g. "satisfies SPEC#INV-3-non-blocking-handover").
 - **RATIONALE is free-form.** No prescribed inner sections. Capture reasoning (forces, alternatives, invalidation triggers), but don't invent a template to fill.
 - **RESEARCH is evidence-only.** Interpretations belong in RATIONALE.
 
@@ -85,7 +85,7 @@ Schemas, interfaces, signatures fold inline here when the decision involves them
    - WHY: one line if trivial and inlined; anchor to RATIONALE if non-trivial (real alternatives existed, tradeoffs accepted, invalidation triggers worth recording).
 4. **Write RATIONALE entries** for non-trivial decisions in `design-rationale.md`. Same `## Decision-<N>: <slug>` heading; free-form body.
 5. **Archive research findings** worth preserving as `## <topic>` blocks in `research.md`. Evidence only.
-6. **Coverage check** — walk each SPEC `## AC-<N>` and each Invariant. Does at least one Decision or an Architecture element realize it? Surface any uncovered items and resolve before finishing.
+6. **Coverage check** — walk each SPEC `### O-<N>` and `### INV-<N>`. Each must be realized by ≥ 1 of: a Decision block, an Architecture element, **or** (for trivial realization not worth a Decision block) a directly-cited TASK Completion criterion that the downstream `plan` skill will add. Surface any uncovered items that *no* path realizes, and resolve before finishing; do not force-create a Decision for a trivial realization that the TASK layer handles directly.
 7. **Self-check** against guardrails:
    - No work ordering / INFRAREQ / rollout text.
    - No top-level Schema section; schemas live inside Decisions.
@@ -96,7 +96,7 @@ Schemas, interfaces, signatures fold inline here when the decision involves them
 
 - `design.md` contains Architecture (Mermaid) + at least one `## Decision-<N>: <slug>` block.
 - Non-trivial decisions have resolvable `design-rationale.md#Decision-<N>-<slug>` targets.
-- Every SPEC AC + Invariant is realized by a Decision or Architecture element.
+- Every SPEC O + INV is realized by a Decision, an Architecture element, or is deferred to a TASK Completion criterion (for trivial realizations).
 - No TASK-level content (work ordering, INFRAREQ procedure, PR stacking notes) in DESIGN.
 - `research.md` updated with new `## <topic>` blocks if archival findings emerged.
 - Tell the user: next edge is `/plan <KEY>`.

@@ -20,7 +20,7 @@ Task cards carry intent + constraints (Goal, Repo, Completion, Dependencies, opt
 - `$ARGUMENTS` — `<feature-key> <task-id>` (both required).
 - `<cwd>/docs/features/<KEY>/task.md` — locate `## Task: <task-id>` card. If absent, stop.
 - Anchors cited in the card:
-  - `SPEC#AC-<N>-<slug>` → `<cwd>/docs/features/<KEY>/spec.md` `## AC-<N>` block.
+  - `SPEC#O-<N>-<slug>` or `SPEC#INV-<N>-<slug>` → `<cwd>/docs/features/<KEY>/spec.md` `### O-<N>` or `### INV-<N>` block (under `## Outcome` / `## Invariants` section headers).
   - `DESIGN#Decision-<N>-<slug>` → `<cwd>/docs/features/<KEY>/design.md` `## Decision-<N>` block.
   - Doc-level Guideline references.
 - `<cwd>/docs/features/<KEY>/design-rationale.md` — **JIT only**. Load a specific `## Decision-<N>` entry when a stop-the-line trigger is under review and you need the full reasoning behind the original decision.
@@ -36,7 +36,7 @@ Task cards carry intent + constraints (Goal, Repo, Completion, Dependencies, opt
 If any of the following surfaces at task entry or mid-implementation, **stop and surface to the user** before writing code. Each trigger points at the artifact layer that's wrong:
 
 1. **Current code contradicts DESIGN** — DESIGN is wrong (or stale). Walk up to DESIGN.
-2. **No verification path exists for a Completion criterion** — the criterion is unverifiable as written. Walk up to TASK (fix the criterion) or further if the underlying SPEC AC / Invariant lacks an observable signal.
+2. **No verification path exists for a Completion criterion** — the criterion is unverifiable as written. Walk up to TASK (fix the criterion) or further if the underlying SPEC O / INV lacks an observable signal.
 3. **A Dependency is missing or itself invalidated** — re-evaluate the DAG at TASK level, not just this card.
 4. **Implementation would require changing an externally-observable behavior** → walk up to SPEC; possibly further to REQUIREMENT if biz scope shifts.
 5. **An Invariant is unprovable by the current test strategy** — add a probe mechanism (test harness, monitor, SLO) at TASK level, or push to a continuous-verification mechanism via DESIGN.
@@ -101,7 +101,7 @@ PR body is particularly durable — visible in GitHub history post-squash, linka
 ## Procedure
 
 1. **Locate the card** `## Task: <task-id>` in `task.md`. Extract Goal (with inline anchors), Repo, Completion criteria, Dependencies, any Guidelines.
-2. **JIT-load anchors** — read only the specific `## AC-<N>` / `## Decision-<N>` sections referenced. Do not eagerly load entire SPEC / DESIGN.
+2. **JIT-load anchors** — read only the specific `### O-<N>` / `### INV-<N>` / `## Decision-<N>` sections referenced. Do not eagerly load entire SPEC / DESIGN.
 3. **Inspect current code** at affected paths. Build a short working model of what exists today. Reality is authoritative.
 4. **Re-reason**: does the plan still apply? Any of the six stop-the-line triggers hit? If yes, run the Artifact update loop and surface to the user.
 5. **Implement** the smallest meaningful change that realizes Goal + passes Completion criteria.

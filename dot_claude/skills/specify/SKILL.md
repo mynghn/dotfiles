@@ -1,6 +1,6 @@
 ---
 name: specify
-description: LeanPlan — derive a SPEC (externally-observable contract) from an existing REQUIREMENT. Generic-category tech only; split episodic ACs from continuous Invariants.
+description: LeanPlan — derive a SPEC (externally-observable contract) from an existing REQUIREMENT. Generic-category tech only; split episodic Outcome items from continuous Invariants.
 argument-hint: "<feature-key>"
 allowed-tools: Read, Write, Edit, Grep, Glob, AskUserQuestion, Bash(ls *), Bash(mkdir *), WebFetch, WebSearch
 ---
@@ -31,16 +31,19 @@ LeanPlan is a lean spec-driven-development framework with staged artifacts (REQU
 
 ## Outcome
 
-### AC-1: <kebab-slug>
+### O-1: <kebab-slug>
 <one episode-verifiable behavior: "when X, Y happens">
 
-### AC-2: <kebab-slug>
+### O-2: <kebab-slug>
 ...
 
 ## Invariants   (conditional — include only when continuous constraints exist)
-- <continuous property that must hold regardless of realization>
-- <SLA, non-blocking, idempotency, integrity, environmental binding (backbone compatibility, compliance boundary, deployment envelope)>
-- ...
+
+### INV-1: <kebab-slug>
+<continuous property that must hold regardless of realization — SLA, non-blocking, idempotency, integrity, environmental binding (backbone compatibility, compliance boundary, deployment envelope)>
+
+### INV-2: <kebab-slug>
+...
 
 ## Non-goals   (conditional — include only when tech-scope edges are ambiguous)
 - <explicitly out-of-scope capability>
@@ -56,14 +59,16 @@ The research-archive append (when used):
 <evidence: codebase grep findings, SOTA article takeaways, industry pattern names, org history. Evidence only — no interpretation.>
 ```
 
-- Anchor pattern for ACs: `## AC-<N>: <slug>`. `N` is a stable integer (don't renumber on edits — append new ACs with higher numbers; retire with an inline `(retired)` note rather than deleting). Slug is short (≤ 5 words), kebab-case, identity (not restatement of the AC body).
+- Section headers `## Outcome` and `## Invariants` (H2) exist for clear separation; items are H3 anchors (`### O-<N>: <slug>` / `### INV-<N>: <slug>`). Markdown anchor fragments resolve regardless of heading level — cross-doc references stay `SPEC#O-<N>-<slug>` and `SPEC#INV-<N>-<slug>`.
+- `N` is a stable integer — don't renumber on edits. Append new items with higher numbers; retire with an inline `(retired)` note rather than deleting.
+- Slug is short (≤ 5 words), kebab-case, identity (not restatement of the item body).
 - Declarative present tense; reserve MUST / MUST NOT for true invariants.
 
 ## Guardrails
 
-- **AC split — episodic vs. continuous.**
-  - Episode-triggered ("when X, Y happens") → `## AC-<N>: <slug>` under **Outcome**. Verifiable by a one-shot test.
-  - Continuous property ("p99 < 5s", "non-blocking", "idempotent", "within compliance boundary X") → **Invariants**. Verified downstream by SLO / monitor / CI gate.
+- **O/INV split — episodic vs. continuous.**
+  - Episode-triggered ("when X, Y happens") → `### O-<N>: <slug>` under **Outcome**. Verifiable by a one-shot test.
+  - Continuous property ("p99 < 5s", "non-blocking", "idempotent", "within compliance boundary X") → `### INV-<N>: <slug>` under **Invariants**. Verified downstream by SLO / monitor / CI gate.
 - **"What a SPEC is NOT" test.** For every line: can the implementation change without changing this externally-observable behavior? If yes, cut the line or push it to DESIGN.
 - **Generic-category tech only.** "Message queue", "event stream", "HTTP API", "distributed cache" stay. Specific names (Kafka, Redis, gRPC, Postgres, Spring) go to DESIGN.
 - **No false optionality.** If a property has no real alternative realization, it isn't a DESIGN choice — push it up to an Invariant so DESIGN isn't asked to choose what was never open.
@@ -73,23 +78,23 @@ The research-archive append (when used):
 ## Procedure
 
 1. **Load REQUIREMENT** from `<cwd>/docs/features/<KEY>/requirement.md`. If absent, stop and point the user at `/requirement`.
-2. **Derive Outcome ACs**: for each biz outcome in REQUIREMENT, ask what externally-observable behavior signals it. Write as `## AC-<N>: <slug>`. One AC per behavior; don't fold two into one.
-3. **Lift Invariants**: collect continuous constraints — SLAs, non-blocking guarantees, idempotency, integrity rules, environmental bindings (existing backbone compatibility, compliance boundary, deployment envelope). If a constraint has no realization alternative, it's an Invariant, not a DESIGN choice.
+2. **Derive Outcome items**: for each biz outcome in REQUIREMENT, ask what externally-observable behavior signals it. Write as `### O-<N>: <slug>` under `## Outcome`. One item per behavior; don't fold two into one.
+3. **Lift Invariants**: collect continuous constraints — SLAs, non-blocking guarantees, idempotency, integrity rules, environmental bindings (existing backbone compatibility, compliance boundary, deployment envelope). Write each as `### INV-<N>: <slug>` under `## Invariants`. If a constraint has no realization alternative, it's an Invariant, not a DESIGN choice.
 4. **Apply the NOT test** on every line: can I swap the implementation without changing this? If yes, cut or push to DESIGN.
 5. **Name only generic categories** for any tech referenced. "Message queue" / "event stream" / "HTTP API". Replace any specific stack name with its category; if no category fits, the content probably belongs in DESIGN.
 6. **Archive research** worth preserving as `## <topic>` blocks in `research.md`. Evidence only. Create the file if needed.
 7. **Write** `<cwd>/docs/features/<KEY>/spec.md`.
 8. **Self-check**:
    - Grep the body for tech-stack nouns (Kafka, Redis, Kotlin, Spring, gRPC, Postgres, Flink, etc.) — zero hits expected.
-   - Every AC has a `## AC-<N>: <slug>` heading and is episode-verifiable (you could write a one-shot test).
-   - Invariants (if present) are all continuous; no sneaky episode-triggered conditions hiding there.
-   - Conditional sections are omitted when empty.
+   - Every O has `### O-<N>: <slug>` under `## Outcome`; every INV has `### INV-<N>: <slug>` under `## Invariants`.
+   - Every O is episode-verifiable (you could write a one-shot test); every INV is continuous (no sneaky episode-triggered conditions hiding as Invariants).
+   - Conditional sections (Invariants, Non-goals) omitted when empty.
 
 ## Completion
 
 - File at `<cwd>/docs/features/<KEY>/spec.md`.
-- Every AC: anchored heading `## AC-<N>: <slug>`, episode-verifiable.
-- Invariants section present iff continuous constraints exist.
+- Every O: `### O-<N>: <slug>` heading under `## Outcome`, episode-verifiable.
+- `## Invariants` section present iff continuous constraints exist; each INV anchored `### INV-<N>: <slug>`.
 - No specific tech-stack names in body.
 - `research.md` updated with new `## <topic>` blocks when archival findings emerged.
 - Tell the user: next edge is `/design <KEY>`.
