@@ -90,7 +90,7 @@ typical content: forces at play, alternatives considered, chosen path, invalidat
 hints. No prescribed schema — capture reasoning, don't fill a form. -->
 EOF
 
-cat > "$DIR/task.md" <<EOF
+cat > "$DIR/plan.md" <<EOF
 # $KEY — TASK
 
 <!-- Doc-level Guidelines section is conditional — include only when feature-wide
