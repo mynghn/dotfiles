@@ -7,94 +7,13 @@ allowed-tools: Read, Write, Edit, Grep, Glob, AskUserQuestion, Bash(ls *), Bash(
 
 # specify
 
-LeanPlan skill. Edge: **REQUIREMENT → SPEC**. Turns the biz WHAT into an externally-observable tech contract that downstream `design` realizes.
+LeanPlan **REQUIREMENT → SPEC** edge. Runtime adapter — operational rules live in the canonical references.
 
-## Context
+Before writing the artifact, load:
 
-LeanPlan is a lean spec-driven-development framework with staged artifacts (REQUIREMENT → SPEC → DESIGN → TASK → code). SPEC is the **contract**: what the finished system must expose to consumers, using *generic-category* tech vocabulary (message queue, event stream, HTTP API) — never specific stacks (Kafka, Redis, gRPC), which belong to DESIGN. This split preserves abstraction altitude: swapping Kafka → SQS should be a DESIGN change, not a SPEC rewrite. Primary reader is the downstream `design` agent; engineering reviewers share the surface.
+- `~/.local/share/leanplan/references/artifact-contract.md` — feature layout, anchor patterns (`O-<N>: <slug>` / `INV-<N>: <slug>`), drift guards, traceability rules including `**GAP**` semantics.
+- `~/.local/share/leanplan/references/specify.md` — stage-specific procedure, "what a SPEC is NOT" test, generic-category tech guard, RESEARCH archive rule.
 
-## Inputs
+If `<cwd>/docs/features/<KEY>/requirement.md` is missing, stop and tell the user to run `/requirement <KEY>` first. Validate after writing with `python3 ~/.local/share/leanplan/scripts/validate.py <cwd>/docs/features/<KEY> --stage spec`.
 
-- `$ARGUMENTS` — `<feature-key>` (required). Path: `<cwd>/docs/features/<KEY>/`.
-- `<cwd>/docs/features/<KEY>/requirement.md` (required). If absent, tell the user to run `/requirement <KEY>` first and stop.
-- `<cwd>/docs/features/<KEY>/research.md` (optional, for context reuse if it already exists).
-
-## Output
-
-- `<cwd>/docs/features/<KEY>/spec.md` — required.
-- `<cwd>/docs/features/<KEY>/research.md` — append `## <topic>` blocks only when a finding is worth archiving for future reference (codebase pattern, SOTA article, industry convention, org history). Create the file if it doesn't exist yet.
-
-## Artifact shape
-
-```
-# <KEY> — SPEC
-
-## Outcome
-
-### O-1: <kebab-slug>
-<one episode-verifiable behavior: "when X, Y happens">
-
-### O-2: <kebab-slug>
-...
-
-## Invariants   (conditional — include only when continuous constraints exist)
-
-### INV-1: <kebab-slug>
-<continuous property that must hold regardless of realization — SLA, non-blocking, idempotency, integrity, environmental binding (backbone compatibility, compliance boundary, deployment envelope)>
-
-### INV-2: <kebab-slug>
-...
-
-## Non-goals   (conditional — include only when tech-scope edges are ambiguous)
-- <explicitly out-of-scope capability>
-- ...
-```
-
-The research-archive append (when used):
-
-```
-# <KEY> — RESEARCH
-
-## <descriptive topic name>
-<evidence: codebase grep findings, SOTA article takeaways, industry pattern names, org history. Evidence only — no interpretation.>
-```
-
-- Section headers `## Outcome` and `## Invariants` (H2) exist for clear separation; items are H3 anchors (`### O-<N>: <slug>` / `### INV-<N>: <slug>`). Markdown anchor fragments resolve regardless of heading level — cross-doc references stay `SPEC#O-<N>-<slug>` and `SPEC#INV-<N>-<slug>`.
-- `N` is a stable integer — don't renumber on edits. Append new items with higher numbers; retire with an inline `(retired)` note rather than deleting.
-- Slug is short (≤ 5 words), kebab-case, identity (not restatement of the item body).
-- Declarative present tense; reserve MUST / MUST NOT for true invariants.
-
-## Guardrails
-
-- **O/INV split — episodic vs. continuous.**
-  - Episode-triggered ("when X, Y happens") → `### O-<N>: <slug>` under **Outcome**. Verifiable by a one-shot test.
-  - Continuous property ("p99 < 5s", "non-blocking", "idempotent", "within compliance boundary X") → `### INV-<N>: <slug>` under **Invariants**. Verified downstream by SLO / monitor / CI gate.
-- **"What a SPEC is NOT" test.** For every line: can the implementation change without changing this externally-observable behavior? If yes, cut the line or push it to DESIGN.
-- **Generic-category tech only.** "Message queue", "event stream", "HTTP API", "distributed cache" stay. Specific names (Kafka, Redis, gRPC, Postgres, Spring) go to DESIGN.
-- **No false optionality.** If a property has no real alternative realization, it isn't a DESIGN choice — push it up to an Invariant so DESIGN isn't asked to choose what was never open.
-- **Conditional sections must earn their place.** Invariants only when continuous constraints exist; Non-goals only when edges are ambiguous. Skip otherwise.
-- **Research archive is evidence-only.** Interpretations belong in RATIONALE (written later by `design`). If a finding can't stand without interpretation, it's not archival — leave it out.
-
-## Procedure
-
-1. **Load REQUIREMENT** from `<cwd>/docs/features/<KEY>/requirement.md`. If absent, stop and point the user at `/requirement`.
-2. **Derive Outcome items**: for each biz outcome in REQUIREMENT, ask what externally-observable behavior signals it. Write as `### O-<N>: <slug>` under `## Outcome`. One item per behavior; don't fold two into one.
-3. **Lift Invariants**: collect continuous constraints — SLAs, non-blocking guarantees, idempotency, integrity rules, environmental bindings (existing backbone compatibility, compliance boundary, deployment envelope). Write each as `### INV-<N>: <slug>` under `## Invariants`. If a constraint has no realization alternative, it's an Invariant, not a DESIGN choice.
-4. **Apply the NOT test** on every line: can I swap the implementation without changing this? If yes, cut or push to DESIGN.
-5. **Name only generic categories** for any tech referenced. "Message queue" / "event stream" / "HTTP API". Replace any specific stack name with its category; if no category fits, the content probably belongs in DESIGN.
-6. **Archive research** worth preserving as `## <topic>` blocks in `research.md`. Evidence only. Create the file if needed.
-7. **Write** `<cwd>/docs/features/<KEY>/spec.md`.
-8. **Self-check**:
-   - Grep the body for tech-stack nouns (Kafka, Redis, Kotlin, Spring, gRPC, Postgres, Flink, etc.) — zero hits expected.
-   - Every O has `### O-<N>: <slug>` under `## Outcome`; every INV has `### INV-<N>: <slug>` under `## Invariants`.
-   - Every O is episode-verifiable (you could write a one-shot test); every INV is continuous (no sneaky episode-triggered conditions hiding as Invariants).
-   - Conditional sections (Invariants, Non-goals) omitted when empty.
-
-## Completion
-
-- File at `<cwd>/docs/features/<KEY>/spec.md`.
-- Every O: `### O-<N>: <slug>` heading under `## Outcome`, episode-verifiable.
-- `## Invariants` section present iff continuous constraints exist; each INV anchored `### INV-<N>: <slug>`.
-- No specific tech-stack names in body.
-- `research.md` updated with new `## <topic>` blocks when archival findings emerged.
-- Tell the user: next edge is `/design <KEY>`.
+After writing, hand off: next edge is `/design <KEY>`.
