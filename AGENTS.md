@@ -10,7 +10,9 @@ Why: context overload degrades reasoning; the model attends best to lean, focuse
 
 <implementation>
 Treat plans and specs as intent plus constraints, not as scripts. Re-derive the
-implementation from current code, tests, and constraints at each chunk. Surface
+implementation from current code, tests, and constraints at each chunk. Make
+changes on a feature branch off the latest production branch (`main` →
+`master` → repo default) unless the user specifies a base. Surface
 tradeoffs and ambiguities for user decision rather than resolving them silently.
 Proceed autonomously through straightforward chunks; pause for review when
 facing irreversible changes, multiple valid approaches, or unclear intent.
@@ -26,6 +28,8 @@ Why: task lists flatten rich plans into independent items, losing cross-cutting 
 </plan_style>
 
 <code_investigation>
+Investigate from the latest production branch (`main` → `master` → repo
+default), synced with remote, so "current behavior" reflects what is shipped.
 Read the code paths needed to make the answer or change defensible. Trace call
 sites, data flow, tests, and configuration when they affect behavior. Verify
 actual implementations rather than assuming behavior from names or signatures.
