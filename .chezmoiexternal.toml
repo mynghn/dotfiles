@@ -3,8 +3,8 @@
     url = "https://github.com/mynghn/leanplan.git"
     refreshPeriod = "168h"
 
-[".local/share/leanplan.clone"]
-    args = ["--depth=1"]
+    [".local/share/leanplan".clone]
+        args = ["--depth=1"]
 
-[".local/share/leanplan.pull"]
-    args = ["--ff-only"]
+    [".local/share/leanplan".pull]
+        args = ["--ff-only"]
