@@ -115,6 +115,20 @@ grpcurl \
   <service>/<Method>
 ```
 
+### Response display rules
+
+Always show the **actual response** to the user, success or failure — never substitute a summary or interpretation alone. Redact secrets (tokens, etc.) before display.
+
+| Response size | How to display |
+|---|---|
+| Fits in chat in one shot (roughly ≤ 4 KB or ≤ 80 lines) | Emit the **full raw JSON in a fenced code block**, then add any interpretation underneath. |
+| Larger than that | (1) Save full body to a temp file and state the path; (2) inline a generous representative slice as raw JSON (e.g. the first few elements of a list) so structure is visible; (3) add a `jq`-derived summary (count, pagination, key fields); (4) explicitly point to `<path>` for the remainder. A response that exists only as a summary, with no reachable raw, is not acceptable. |
+| gRPC status error | Print the status code, message, **and all trailers** — especially `google.rpc.ErrorInfo` (`domain`, `reason`, `metadata`). If ErrorInfo is empty, say so explicitly so the user isn't left guessing whether you suppressed it. |
+
+Always print the invoking command above the response with the token redacted to `<TOKEN>` so the user can reproduce the call themselves.
+
+### Failure patterns
+
 Capture stdout+stderr. Common failure patterns and remediation:
 
 | Symptom | Likely cause | Next step |
