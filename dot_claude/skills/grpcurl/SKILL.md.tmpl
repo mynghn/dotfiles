@@ -1,0 +1,8 @@
+---
+name: grpcurl
+description: Invoke a gRPC method against a remote endpoint. Auto-decides schema source (server reflection vs `buf build` descriptor), auth scheme, and payload shape — only asks the user when a choice is genuinely ambiguous.
+argument-hint: "[<endpoint>] [<service>/<method>] [-- <raw extra grpcurl args>]"
+allowed-tools: Bash, Read, Glob, AskUserQuestion
+---
+
+{{ template "grpcurl-body.md" . }}
