@@ -91,10 +91,12 @@ grpcurl -protoset /tmp/grpcurl-<short>.binpb describe <service>.<MethodRequest>
 b) **Author the JSON**:
 - For payloads with ≤4 leaf fields → propose the full JSON inline, ask the user to confirm or edit.
 - For larger / nested payloads → emit a JSON template with required fields scaffolded (using sane placeholders or values inferred from the user's prompt), and ask the user to fill or correct.
-- **proto3 quirks to handle silently**:
+- **proto3 quirks to handle silently** (these follow the [protobuf JSON mapping spec](https://protobuf.dev/programming-guides/json/) — `grpcurl` rejects shapes that aren't spec-compliant on the way in):
   - Enums as integers OR symbolic names — both work; prefer the symbolic form in scaffolds.
-  - `google.protobuf.Timestamp` → `{"seconds": "..."}` (string-encoded int64).
-  - `google.type.Interval` / similar wrapper types → use the nested message shape, not bare scalars.
+  - `google.protobuf.Timestamp` → **RFC 3339 string**, e.g. `"2026-05-22T00:00:00Z"`. The `{"seconds": "..."}` raw-wire form (what Kotlin/Java builders use internally) is **not** accepted by JSON unmarshal — `grpcurl` returns `cannot unmarshal object into Go value of type string`.
+  - `google.protobuf.Duration` → string ending in `s`, e.g. `"3.5s"`, `"600s"`.
+  - `google.type.Interval` (nested) → `{"startTime": "<RFC3339>", "endTime": "<RFC3339>"}` — its inner fields are Timestamps and follow the rule above.
+  - Wrapper types (`StringValue`, `Int32Value`, `BoolValue`, …) → encoded as the wrapped value directly, **not** as an object. `Int32Value(42)` → `42`, `StringValue("x")` → `"x"`, not `{"value": …}`.
   - `oneof` — set exactly one branch; omit the others.
   - `optional` scalar fields in proto3 — present as JSON `null` only when intentionally absent; otherwise omit.
 
