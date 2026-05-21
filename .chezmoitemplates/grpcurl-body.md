@@ -96,7 +96,8 @@ b) **Author the JSON**:
   - `google.protobuf.Timestamp` → **RFC 3339 string**, e.g. `"2026-05-22T00:00:00Z"`. The `{"seconds": "..."}` raw-wire form (what Kotlin/Java builders use internally) is **not** accepted by JSON unmarshal — `grpcurl` returns `cannot unmarshal object into Go value of type string`.
   - `google.protobuf.Duration` → string ending in `s`, e.g. `"3.5s"`, `"600s"`.
   - `google.type.Interval` (nested) → `{"startTime": "<RFC3339>", "endTime": "<RFC3339>"}` — its inner fields are Timestamps and follow the rule above.
-  - Wrapper types (`StringValue`, `Int32Value`, `BoolValue`, …) → encoded as the wrapped value directly, **not** as an object. `Int32Value(42)` → `42`, `StringValue("x")` → `"x"`, not `{"value": …}`.
+  - **Well-known wrapper types from `google/protobuf/wrappers.proto`** (`google.protobuf.StringValue`, `Int32Value`, `BoolValue`, `Int64Value`, `DoubleValue`, …) → encoded as the wrapped value directly. `Int32Value(42)` → `42`, `StringValue("x")` → `"x"`. `{"value": …}` is **rejected** by grpcurl (`cannot unmarshal object into Go value of type <scalar>`). Empirically verified.
+  - **User-defined "wrapper-shaped" messages** (a regular `message Foo { T value = 1; }` that an org happens to define for its own optional-or-tombstone purposes) → these are NOT well-known wrappers and follow the **normal nested-message JSON shape**: `{"value": …}`. The well-known special-casing applies only to types whose fully-qualified name is in `google.protobuf.*Value` — check the field's `type_name` in the descriptor if unsure.
   - `oneof` — set exactly one branch; omit the others.
   - `optional` scalar fields in proto3 — present as JSON `null` only when intentionally absent; otherwise omit.
 
