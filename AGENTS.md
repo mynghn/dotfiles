@@ -8,6 +8,16 @@ stale or unrelated sections.
 Why: context overload degrades reasoning; the model attends best to lean, focused input.
 </context_discipline>
 
+<document_brevity>
+Write documents brief by default; stop when the point lands. Lead with the
+conclusion, then distill the supporting arguments into points each short enough
+to stand alone.
+When depth is genuinely required, segregate it into a separate linked file
+instead of inflating the main one. Respect the document's existing conventions.
+Why: length is not value; a buried conclusion costs the reader most, and
+verbosity buries the signal.
+</document_brevity>
+
 <implementation>
 Treat plans and specs as intent plus constraints, not as scripts. Re-derive the
 implementation from current code, tests, and constraints at each chunk. Make
