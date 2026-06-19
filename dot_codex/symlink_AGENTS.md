@@ -1,1 +1,1 @@
-/Users/mynghn/AGENTS.md
+../AGENTS.md
