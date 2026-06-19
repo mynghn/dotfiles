@@ -10,4 +10,3 @@ Each line: `- [<technique-slug>](knowledge/<technique-slug>.md) — <one-line de
 
 <!-- one line per technique; appended by capture/refresh via scripts/pe-kb -->
 
-- [c2-selftest](knowledge/c2-selftest.md) — throwaway entry verifying the pe-kb capture/remove round-trip
