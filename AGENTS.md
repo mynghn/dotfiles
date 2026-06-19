@@ -46,21 +46,6 @@ the prompt — exactly when nothing else reminds you. Its sibling
 `context-engineering-knowledge-base` owns managing what fills the window.
 </prompt_engineering>
 
-<tool_design>
-Reach for the `tool-design-knowledge-base` skill — read its INDEX, load
-only the fitting entry — whenever you are designing a tool an agent will
-call: its description, input/output schema, granularity / consolidation,
-namespacing, what it returns, or its error messages. Its one-line
-description fires on an explicit "how should this tool be shaped" lookup
-but won't auto-match a step you've framed as "coding" or "wiring up an
-API", so trigger it deliberately while you draft the tool. Capture or
-refresh durable lessons through the skill.
-Why: the highest-leverage moment is mid-task while you define the tool.
-Its siblings `prompt-engineering-knowledge-base` (the instruction's
-wording) and `context-engineering-knowledge-base` (what already occupies
-the window) own the adjacent territory.
-</tool_design>
-
 <compaction>
 Compaction is the highest-stakes context-engineering moment in a session — apply
 the knowledge-base's own operations to it. When you compact, or recommend the
