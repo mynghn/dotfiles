@@ -1,21 +1,58 @@
 #!/usr/bin/env bash
-# PreToolUse hook (Bash): require the Claude Code attribution footer on
-# GitHub comment-posting commands.
+# PreToolUse hook: require the Claude Code attribution footer on GitHub
+# comment-posting calls, across BOTH channels:
 #
-# Reads the Bash tool-call JSON on stdin. If the command posts a GitHub comment
-# (gh pr/issue comment, gh pr review --body, gh api .../comments, graphql
-# add*Comment) and the marker URL claude.com/claude-code is absent from both the
-# command text AND any referenced --body-file / -F / body=@file, it denies the
-# call and tells the model to append the footer.
+#   1. Bash `gh` commands  (matcher: Bash + if Bash(gh *))
+#      - gh pr/issue comment, gh pr review --body, gh api .../comments,
+#        graphql add*Comment. Marker is sought in the command text AND any
+#        referenced --body-file / -F / body=@file.
 #
-# Fails open: anything it can't positively classify as a marker-less comment
-# post is allowed through (a missed enforcement is preferable to blocking
-# unrelated git/gh work).
+#   2. GitHub MCP tools     (matcher: the comment/review-write tool names)
+#      - add_issue_comment, add_comment_to_pending_review,
+#        add_reply_to_pull_request_comment, pull_request_review_write.
+#        Marker is sought in the structured `.tool_input.body` field.
+#
+# On a marker-less comment it denies the call and tells the model to append the
+# footer. Fails open: anything it can't positively classify as a marker-less
+# comment post is allowed (a missed enforcement beats blocking unrelated work).
 set -uo pipefail
 
 MARKER='claude.com/claude-code'
 
+REASON='이 GitHub 코멘트에 Claude Code 작성 표시가 없습니다. 코멘트 본문 끝에 아래 footer를 추가한 뒤 다시 실행하세요:
+
+🤖 *Generated with [Claude Code](https://claude.com/claude-code)*
+
+(hook은 claude.com/claude-code 마커가 본문에 있는지 확인합니다. Bash 경로는 --body-file/-F 대상 파일도 검사합니다.)'
+
+deny() {
+  jq -n --arg r "$REASON" '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"deny",permissionDecisionReason:$r}}'
+  exit 0
+}
+
 input=$(cat)
+tool=$(printf '%s' "$input" | jq -r '.tool_name // ""' 2>/dev/null)
+
+# ---------------------------------------------------------------------------
+# Channel 2: GitHub MCP comment/review-write tools. Body lives in .tool_input.body.
+# ---------------------------------------------------------------------------
+case "$tool" in
+  mcp__*github*__add_issue_comment \
+  | mcp__*github*__add_comment_to_pending_review \
+  | mcp__*github*__add_reply_to_pull_request_comment \
+  | mcp__*github*__pull_request_review_write)
+    body=$(printf '%s' "$input" | jq -r '.tool_input.body // ""' 2>/dev/null)
+    # No body (review approve/request-changes without text, resolve_thread,
+    # delete_pending, etc.) -> nothing to attribute.
+    [ -n "$body" ] || exit 0
+    printf '%s' "$body" | grep -qF "$MARKER" && exit 0
+    deny
+    ;;
+esac
+
+# ---------------------------------------------------------------------------
+# Channel 1: Bash `gh` commands.
+# ---------------------------------------------------------------------------
 cmd=$(printf '%s' "$input" | jq -r '.tool_input.command // ""' 2>/dev/null)
 
 # Fast path: not a gh invocation -> nothing to enforce.
@@ -80,11 +117,4 @@ done <<EOF
 $candidates
 EOF
 
-REASON='이 GitHub 코멘트에 Claude Code 작성 표시가 없습니다. 코멘트 본문 끝에 아래 footer를 추가한 뒤 다시 실행하세요:
-
-🤖 *Generated with [Claude Code](https://claude.com/claude-code)*
-
-(hook은 claude.com/claude-code 마커가 본문 또는 --body-file/-F 대상 파일에 있는지 확인합니다.)'
-
-jq -n --arg r "$REASON" '{hookSpecificOutput:{hookEventName:"PreToolUse",permissionDecision:"deny",permissionDecisionReason:$r}}'
-exit 0
+deny

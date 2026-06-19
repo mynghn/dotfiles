@@ -24,5 +24,8 @@ echo "$input" | jq '
   }, {
     "matcher": "Bash",
     "hooks": [{"type": "command", "command": "~/.claude/hooks/gh-comment-attribution.sh", "if": "Bash(gh *)", "statusMessage": "Checking GitHub comment attribution..."}]
+  }, {
+    "matcher": "mcp__plugin_github_github__(add_issue_comment|add_comment_to_pending_review|add_reply_to_pull_request_comment|pull_request_review_write)",
+    "hooks": [{"type": "command", "command": "~/.claude/hooks/gh-comment-attribution.sh", "statusMessage": "Checking GitHub comment attribution..."}]
   }]
 '
