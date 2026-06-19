@@ -9,6 +9,11 @@ BEGIN {
   previous_blank = 0
   in_section = 0
   printed_any = 0
+  print "# chezmoi-managed: context-engineering compaction policy"
+  print "compact_prompt = \"Summarize the conversation to free context, in the context-engineering spirit. Keep the working set: the current goal, key decisions and their rationale, live constraints, and open threads or next steps. Preserve must-not-lose instructions and the task statement verbatim. Replace bulky content with reloadable references (file paths, commit SHAs, URLs) instead of full payloads. Drop resolved tangents, dead ends, verbose tool output, and superseded attempts. Produce the smallest high-signal summary that still lets the work continue.\""
+  print ""
+  printed_any = 1
+  previous_blank = 1
 }
 
 /^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
@@ -31,7 +36,11 @@ BEGIN {
     next
   }
 
-  if (!in_section && $0 ~ /^[[:space:]]*(model|model_reasoning_effort|tool_output_token_limit|web_search)[[:space:]]*=/) {
+  if ($0 ~ /^[[:space:]]*# chezmoi-managed: context-engineering compaction policy[[:space:]]*$/) {
+    next
+  }
+
+  if (!in_section && $0 ~ /^[[:space:]]*(model|model_reasoning_effort|tool_output_token_limit|web_search|compact_prompt)[[:space:]]*=/) {
     next
   }
 
