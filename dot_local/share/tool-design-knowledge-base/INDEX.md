@@ -10,6 +10,7 @@ Each line: `- [<practice-slug>](knowledge/<practice-slug>.md) — <one-line desc
 
 <!-- one line per practice; appended by capture/refresh via scripts/td-kb -->
 
+- [high-signal-returns](knowledge/high-signal-returns.md) — Use when designing what a tool hands back to the agent — choosing which fields to return, surfacing semantic names over opaque IDs, returning act-on-able data instead of raw API dumps, or fixing agents that hallucinate IDs or stall on noisy tool output.
 - [input-schema-design](knowledge/input-schema-design.md) — Use when designing or reviewing a tool's input parameters — naming, types, required vs optional, enums vs free-text, defaults, constraints, formats — to make invalid calls hard or impossible for the agent to represent.
 - [structured-output-shaping](knowledge/structured-output-shaping.md) — Use when deciding whether a tool's return (or a model's final answer) should be constrained by an enforced JSON Schema vs left free, choosing strict mode / response_format / json_schema / MCP outputSchema, and designing a schema for reliable machine parsing.
 - [tool-description-writing](knowledge/tool-description-writing.md) — Use when writing or reviewing the description/docstring of a tool an agent calls — stating its purpose, an explicit "use when", per-parameter meaning, in-description examples and usage limits, or disambiguating it from a near-twin tool.
