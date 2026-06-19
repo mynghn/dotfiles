@@ -8,6 +8,19 @@ stale or unrelated sections.
 Why: context overload degrades reasoning; the model attends best to lean, focused input.
 </context_discipline>
 
+<context_engineering>
+When the work turns context-heavy — long-horizon or multi-step tasks, large
+codebases, RAG / agent / prompt design, or long-context degradation symptoms
+(recall misses, "more context made it worse", distractor errors, window
+pressure, cache-cost spikes) — consult the `context-engineering-knowledge-base`
+skill: read its INDEX, then load only the entry that fits. Capture a durable new
+lesson, or refresh a stale one, through the skill.
+Why: the rules above apply context engineering by reflex; this skill is the
+sourced, deeper reference behind them. It is just-in-time — its one-line
+description won't auto-match a task you've framed as "coding" or "research", so
+reach for it deliberately when the work becomes context-heavy.
+</context_engineering>
+
 <document_brevity>
 Write documents brief by default; stop when the point lands. Lead with the
 conclusion, then distill the supporting arguments into points each short enough
