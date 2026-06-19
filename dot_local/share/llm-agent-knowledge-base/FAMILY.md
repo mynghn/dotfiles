@@ -24,11 +24,11 @@ The field's own stack (Osmani, 2026): **prompt → context → harness → loop*
 
 ### Built
 - **context-engineering** — what occupies the window + long-context degradation (lost-in-the-middle, context-rot, distractors) + write/select/compress/isolate. *Boundary: the window now.* — SHIPPED (14 entries).
+- **prompt-engineering** — composing the instruction: clarity & structure, few-shot exemplars, reasoning elicitation (CoT), output-format wording, prompt-level decomposition. *Boundary: wording vs the window.* — SHIPPED (12 entries, `0002-prompt-engineering-knowledge-base`).
 
 ### Core (planned)
 | Sibling stem | Scope | Boundary |
 |---|---|---|
-| **prompt-engineering** | Composing the instruction — clarity, few-shot, CoT, output format, decomposition | wording vs the window (context) |
 | **tool-design** | The tool/function contract — descriptions, schemas, granularity, error design, MCP; absorbs structured-output | the tool *surface* vs how tools are *sequenced* (architectures) |
 | **agent-architectures** | Control flow & orchestration — workflows vs autonomous loop, ReAct, reflection, routing, single/multi-agent; absorbs loop-engineering's control envelope | control flow vs runtime *execution* (agent-runtime) |
 | **evaluation-observability** | Eval-driven dev, LLM-as-judge, eval harnesses, tracing | measuring vs runtime *enforcement* (guardrails) |
