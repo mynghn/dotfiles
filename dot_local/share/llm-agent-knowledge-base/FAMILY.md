@@ -1,14 +1,20 @@
-# Agent Best-Practice KBs — Family Registry
+# LLM-Agent Knowledge Bases — Family Registry
 
-The "should I add a sibling?" decision record for a **federated** family of agent-practice knowledge bases. Each sibling is its own focused KB skill following the `context-engineering-kb` pattern.
+The "should I add a sibling?" decision record for a **federated** family of agent-practice knowledge bases. Each sibling is its own focused KB skill following the `context-engineering-knowledge-base` pattern.
 
 ## Model
 
-Federated focused skills, not one broad KB. Each sibling = one coherent, closeable agent-practice topic, realized as the proven pattern: a provider-neutral shared core (`~/.local/share/<topic>-kb/`: INDEX + `knowledge/` + a `ce-kb`-style helper) with thin Claude + Codex `SKILL.md` adapters; entries distilled, self-contained, sourced + dated; retrieval is INDEX → JIT; mutation is source-write → `chezmoi apply` → commit.
+Federated focused skills, not one broad KB. Each sibling = one coherent, closeable agent-practice topic, realized as the proven pattern: a provider-neutral shared core (`~/.local/share/<topic>-knowledge-base/`: INDEX + `knowledge/` + a `ce-kb`-style helper) with thin Claude + Codex `SKILL.md` adapters; entries distilled, self-contained, sourced + dated; retrieval is INDEX → JIT; mutation is source-write → `chezmoi apply` → commit.
 
 Why federated: small coherent units retrieve precisely (a skill auto-invokes on its `description` — a narrow description is a sharp trigger), avoid the broad-index scaling cost, and isolate by topic.
 
-**Admission test for a new sibling:** coherent + closeable + backed by primary sources + non-overlapping with existing siblings. Don't extract a shared pattern/generator until ≥3 siblings exist (rule of three) — `context-engineering-kb` is the de-facto template until then.
+**Admission test for a new sibling:** coherent + closeable + backed by primary sources + non-overlapping with existing siblings. Don't extract a shared pattern/generator until ≥3 siblings exist (rule of three) — `context-engineering-knowledge-base` is the de-facto template until then.
+
+## Naming convention
+
+Spelled-out everywhere: skill name, both adapter dirs (`~/.claude/skills/…`, `~/.codex/skills/…`), and the core dir (`~/.local/share/…`) all use `<topic>-knowledge-base` — confirmed on `context-engineering-knowledge-base`. `-kb` is not used in user-facing names. The family-table entries below are topic **stems**; the realized skill/dir name appends `-knowledge-base` (e.g. `prompt-engineering` → `prompt-engineering-knowledge-base`).
+
+This registry root is `llm-agent-knowledge-base` and is a **registry, not a skill** — it has no `SKILL.md` and is never auto-invoked. The siblings are the skills; this is their map.
 
 ## Validated layering
 
@@ -20,7 +26,7 @@ The field's own stack (Osmani, 2026): **prompt → context → harness → loop*
 - **context-engineering** — what occupies the window + long-context degradation (lost-in-the-middle, context-rot, distractors) + write/select/compress/isolate. *Boundary: the window now.* — SHIPPED (14 entries).
 
 ### Core (planned)
-| Sibling | Scope | Boundary |
+| Sibling stem | Scope | Boundary |
 |---|---|---|
 | **prompt-engineering** | Composing the instruction — clarity, few-shot, CoT, output format, decomposition | wording vs the window (context) |
 | **tool-design** | The tool/function contract — descriptions, schemas, granularity, error design, MCP; absorbs structured-output | the tool *surface* vs how tools are *sequenced* (architectures) |
@@ -28,7 +34,7 @@ The field's own stack (Osmani, 2026): **prompt → context → harness → loop*
 | **evaluation-observability** | Eval-driven dev, LLM-as-judge, eval harnesses, tracing | measuring vs runtime *enforcement* (guardrails) |
 
 ### Second wave (planned)
-| Sibling | Scope | Boundary |
+| Sibling stem | Scope | Boundary |
 |---|---|---|
 | **retrieval-rag** | Fetch + rank external knowledge — chunking, embeddings, hybrid, rerank, contextual retrieval | *fetch* vs *place in window* (context) |
 | **memory-state** | Cross-session persistence + recall — short/long-term, semantic/episodic/procedural, write/consolidation | *across windows* vs *this window* (context) |
