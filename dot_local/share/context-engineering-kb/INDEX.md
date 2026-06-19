@@ -11,6 +11,7 @@ Each line: `- [<concept-slug>](knowledge/<concept-slug>.md) — <one-line descri
 <!-- one line per concept; appended by capture/refresh via scripts/ce-kb -->
 
 - [attention-sinks](knowledge/attention-sinks.md) — Load when the first few tokens dominate attention scores, when a sliding window / prefix truncation breaks a long-context model or makes perplexity explode, or when designing KV-cache eviction that must preserve the prompt start.
+- [context-as-working-set](knowledge/context-as-working-set.md) — Load when deciding what an agent keeps, drops, stores, or splits in its context window — treating context as a finite "attention budget" to curate, not a free buffer to fill.
 - [context-rot](knowledge/context-rot.md) — Load when accuracy drops as the prompt gets longer even on simple tasks, or when "more context made it worse" / long-context reliability is in question.
 - [distractor-sensitivity](knowledge/distractor-sensitivity.md) — Load when retrieval accuracy drops even though the answer is present in the window; when topically-related-but-wrong content sits near the target; when padding prompts with "might-be-useful" RAG chunks or long context seems to hurt rather than help — the noise axis of context degradation.
 - [effective-vs-advertised-context](knowledge/effective-vs-advertised-context.md) — Load when a model passes needle-in-haystack but degrades on real long-context tasks (multi-hop, aggregation), or when deciding how much of an advertised window (32K/128K/1M) to actually fill.
