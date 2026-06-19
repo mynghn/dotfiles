@@ -20,7 +20,7 @@ take only the current step's slice — ignore stale or superseded sections.
 <context_engineering>
 Reach for the `context-engineering-knowledge-base` skill — read its INDEX,
 load only the fitting entry — the moment work shows context strain:
-long-horizon/multi-step, large codebase, RAG/agent/prompt design, or
+long-horizon/multi-step, large codebase, RAG/agent design, or
 degradation symptoms (recall misses, "more context made it worse", distractor
 errors, window pressure, cache-cost spikes). Its one-line description won't
 auto-match a task you've framed as "coding" or "research", so trigger it
@@ -29,6 +29,22 @@ the skill.
 Why: it's the sourced reference behind these rules, and the trigger is
 manual because a strained context won't notice its own strain.
 </context_engineering>
+
+<prompt_engineering>
+Reach for the `prompt-engineering-knowledge-base` skill — read its INDEX,
+load only the fitting entry — whenever you are composing the instruction
+itself, not only when asked a prompt-engineering question: wording or
+structuring a prompt, authoring a sub-agent / tool / workflow prompt,
+choosing few-shot exemplars, eliciting reasoning (chain-of-thought,
+scaffolds), specifying output format, or decomposing / chaining a task. Its
+one-line description fires on an explicit "how do I prompt X" lookup but
+won't auto-match a step you've framed as "coding" or "delegating", so trigger
+it deliberately while you draft the instruction. Capture or refresh durable
+lessons through the skill.
+Why: the highest-leverage moment to consult it is mid-task while you write
+the prompt — exactly when nothing else reminds you. Its sibling
+`context-engineering-knowledge-base` owns managing what fills the window.
+</prompt_engineering>
 
 <compaction>
 Compaction is the highest-stakes context-engineering moment in a session — apply
