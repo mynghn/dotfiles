@@ -36,7 +36,7 @@ cannot run it yourself — the user pastes it):
 - Smallest high-signal summary that still lets the work continue.
 Auto-compaction takes no instructions, so offer the line when the user signals a
 compact or before a long task, and re-establish the working set by these rules
-after one happens. `/ce-compact` emits a tailored line on demand.
+after one happens. On Claude, `/compact-focus` emits a tailored line on demand.
 Why: these mirror knowledge/{compaction-vs-eviction, context-as-working-set,
 lost-in-the-middle, jit-loading, structured-note-taking, distractor-sensitivity};
 the KB earns its keep only if it governs the session's own compaction.
