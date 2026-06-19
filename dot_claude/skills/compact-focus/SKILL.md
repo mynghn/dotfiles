@@ -7,7 +7,7 @@ Produce a single ready-to-paste `/compact <focus>` command line that compacts TH
 
 Tailor it to the actual session — name the real items, do not emit a generic template:
 
-- **Keep**: current goal, key decisions + rationale, live constraints, open threads / next steps.
+- **Keep** (only what would otherwise be *lost*): goal, live decisions + their load-bearing rationale, constraints, open threads / next steps. Anything reloadable — rationale already in a doc, shipped code, file:line facts — goes under **Refs**, not restated here.
 - **Verbatim**: any must-not-lose instructions and the task statement.
 - **Refs not payloads**: replace bulky content with file paths, commit SHAs, entry slugs, URLs.
 - **Drop**: resolved tangents, dead ends, verbose tool output, superseded attempts.
