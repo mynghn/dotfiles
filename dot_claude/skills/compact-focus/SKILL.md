@@ -15,4 +15,6 @@ Tailor it to the actual session — name the real items, do not emit a generic t
 
 Lay it out as labeled blocks — `Keep:` / `Verbatim:` / `Refs:` / `Drop:`, each on its own line(s), one directive per line — never a run-on wall. Terse content, explicit structure: a clearly delimited focus is followed more reliably by the summarizer (a dense paragraph forces it to infer section boundaries and risks dropping directives), and stays sanity-checkable at a glance.
 
+Write the prose in the language the user uses in their own prompts (not the session aggregate — model output, loaded docs, and code skew English); keep technical anchors — paths, identifiers, code, SHAs, proto names — verbatim.
+
 Output ONLY the `/compact …` line, in a code block, ready to copy — then one sentence telling the user to paste it (you cannot run `/compact` yourself). If you surfaced this proactively rather than on request, add a short note on why now (e.g. session length, before a heavy task).
