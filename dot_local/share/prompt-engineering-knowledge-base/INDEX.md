@@ -10,3 +10,4 @@ Each line: `- [<technique-slug>](knowledge/<technique-slug>.md) — <one-line de
 
 <!-- one line per technique; appended by capture/refresh via scripts/pe-kb -->
 
+- [explicit-instruction](knowledge/explicit-instruction.md) — Replacing a vague ask with a precise directive — stating exactly what is wanted: the desired output, format, constraints, intended audience, and success criteria, instead of relying on the model to infer intent.
