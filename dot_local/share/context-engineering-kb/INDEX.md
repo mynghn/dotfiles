@@ -9,3 +9,5 @@ Each line: `- [<concept-slug>](knowledge/<concept-slug>.md) — <one-line descri
 ## Concepts
 
 <!-- one line per concept; appended by capture/refresh via scripts/ce-kb -->
+
+- [lost-in-the-middle](knowledge/lost-in-the-middle.md) — Recall is strong for facts at the top or bottom of a long prompt but weak for facts buried in the middle; or deciding where in the window to place critical instructions and the most relevant retrieved documents.
