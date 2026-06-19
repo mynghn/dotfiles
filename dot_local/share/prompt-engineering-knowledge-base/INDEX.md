@@ -10,6 +10,7 @@ Each line: `- [<technique-slug>](knowledge/<technique-slug>.md) — <one-line de
 
 <!-- one line per technique; appended by capture/refresh via scripts/pe-kb -->
 
+- [chain-of-thought](knowledge/chain-of-thought.md) — Asking a model to reason step by step before it answers, to raise accuracy on multi-step arithmetic, logic, or commonsense tasks; deciding whether to elicit explicit reasoning at all on a modern reasoning model.
 - [delimiters-and-structure](knowledge/delimiters-and-structure.md) — Wording a prompt that mixes several roles — instructions, context, reference data, examples, the user's input — and the model blurs them or follows the wrong part; deciding how to fence each section (XML tags, markdown headings, delimiters) so each role is parsed unambiguously.
 - [exemplar-selection](knowledge/exemplar-selection.md) — Choosing WHICH few-shot examples to include and in what ORDER — picking representative, diverse, correct, consistently-formatted exemplars, and countering majority-label/recency/order bias from a bad selection.
 - [explicit-instruction](knowledge/explicit-instruction.md) — Replacing a vague ask with a precise directive — stating exactly what is wanted: the desired output, format, constraints, intended audience, and success criteria, instead of relying on the model to infer intent.
