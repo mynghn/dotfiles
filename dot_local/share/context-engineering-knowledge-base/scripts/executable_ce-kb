@@ -102,9 +102,37 @@ PY
   apply_commit "$src" "$verb" "$slug"
 }
 
+# Delete an entry: drop its file + INDEX line, apply, one commit. The counterpart
+# of capture — removal stays on the single mutation channel (e.g. when an entry is
+# merged into another) instead of being hand-rolled.
+remove_entry() {
+  local slug="${1:-}"
+  [[ -n "$slug" ]] || die "usage: ce-kb remove <slug>"
+  valid_slug "$slug"
+  local src entry; src="$(core_src)"; entry="$src/knowledge/$slug.md"
+  [[ -e "$entry" ]] || die "entry '$slug' not found"
+  rm -f "$entry"
+  CE_SRC="$src" CE_SLUG="$slug" python3 - <<'PY'
+import os, re
+src, slug = os.environ['CE_SRC'], os.environ['CE_SLUG']
+idx = os.path.join(src, 'INDEX.md')
+L = open(idx, encoding='utf-8').read().split('\n')
+pat = re.compile(r'^- \[%s\]\(knowledge/%s\.md\) — ' % (re.escape(slug), re.escape(slug)))
+open(idx, 'w', encoding='utf-8').write('\n'.join(l for l in L if not pat.match(l)))
+PY
+  rm -f "$CORE_TARGET/knowledge/$slug.md"   # chezmoi won't delete an unmanaged target
+  chezmoi apply "$CORE_TARGET" >/dev/null
+  local root; root="$(chezmoi source-path)"
+  git -C "$root" add -A -- "$src/knowledge/$slug.md" "$src/INDEX.md"
+  git -C "$root" diff --cached --quiet && die "nothing changed for '$slug'"
+  git -C "$root" commit -q -m "ce-kb: remove $slug"
+  printf 'ce-kb: removed %s (%s)\n' "$slug" "$(git -C "$root" rev-parse --short HEAD)"
+}
+
 case "${1:-}" in
   capture) shift; write_entry capture "$@" ;;
   refresh) shift; write_entry refresh "$@" ;;
+  remove)  shift; remove_entry "$@" ;;
   path)    printf 'target: %s\nsource: %s\nroot:   %s\n' "$CORE_TARGET" "$(core_src)" "$(chezmoi source-path)" ;;
-  *) die "usage: ce-kb {capture|refresh} <slug>   (entry markdown on stdin)  |  ce-kb path" ;;
+  *) die "usage: ce-kb {capture|refresh} <slug>  (entry markdown on stdin)  |  ce-kb remove <slug>  |  ce-kb path" ;;
 esac
