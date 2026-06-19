@@ -82,7 +82,7 @@ EOF
 
 REASON='이 GitHub 코멘트에 Claude Code 작성 표시가 없습니다. 코멘트 본문 끝에 아래 footer를 추가한 뒤 다시 실행하세요:
 
-🤖 Generated with [Claude Code](https://claude.com/claude-code)
+🤖 *Generated with [Claude Code](https://claude.com/claude-code)*
 
 (hook은 claude.com/claude-code 마커가 본문 또는 --body-file/-F 대상 파일에 있는지 확인합니다.)'
 
