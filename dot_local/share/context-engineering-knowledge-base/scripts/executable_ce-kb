@@ -7,7 +7,7 @@
 # this helper (the lone write path keeps the core internally consistent).
 set -euo pipefail
 
-CORE_TARGET="$HOME/.local/share/context-engineering-kb"
+CORE_TARGET="$HOME/.local/share/context-engineering-knowledge-base"
 
 die() { printf 'ce-kb: %s\n' "$1" >&2; exit 1; }
 
@@ -20,7 +20,7 @@ core_src() {
   local s
   s="$(chezmoi source-path "$CORE_TARGET" 2>/dev/null || true)"
   if [[ -z "$s" || ! -d "$s" ]]; then
-    s="$(chezmoi source-path)/dot_local/share/context-engineering-kb"
+    s="$(chezmoi source-path)/dot_local/share/context-engineering-knowledge-base"
   fi
   [[ -d "$s" ]] || die "core source not found — run task C1 (chezmoi apply) first"
   printf '%s' "$s"

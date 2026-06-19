@@ -16,7 +16,7 @@ Useful context-engineering lessons tend to evaporate at the end of a session. Th
 ## Layout
 
 ```
-~/.local/share/context-engineering-kb/
+~/.local/share/context-engineering-knowledge-base/
 ├── README.md            ← you are here
 ├── INDEX.md             ← one line per concept; the retrieval entry point
 ├── knowledge/
@@ -27,8 +27,8 @@ Useful context-engineering lessons tend to evaporate at the end of a session. Th
 
 Two thin adapters point agents at this core (same body, provider-specific frontmatter):
 
-- `~/.claude/skills/context-engineering-kb/SKILL.md` (Claude Code)
-- `~/.codex/skills/context-engineering-kb/SKILL.md` (Codex)
+- `~/.claude/skills/context-engineering-knowledge-base/SKILL.md` (Claude Code)
+- `~/.codex/skills/context-engineering-knowledge-base/SKILL.md` (Codex)
 
 ## How it works
 
@@ -45,7 +45,7 @@ Inside Claude Code or Codex you usually don't run anything by hand: ask a contex
 ### Adding or updating an entry by hand
 
 ```sh
-~/.local/share/context-engineering-kb/scripts/ce-kb capture my-concept <<'EOF'
+~/.local/share/context-engineering-knowledge-base/scripts/ce-kb capture my-concept <<'EOF'
 ---
 name: my-concept
 description: one line — a retrieval trigger, "load when…"
@@ -103,4 +103,4 @@ The store enforces these as structure, not just intent:
 
 ## How it's stored
 
-The store is managed by [chezmoi](https://chezmoi.io) and lives in its git repo as `dot_local/share/context-engineering-kb/`. Edits are made to the chezmoi **source**, then `chezmoi apply` deploys them here — the deployed copy is never hand-edited. That makes the store reproducible on any machine and gives every change a recoverable history.
+The store is managed by [chezmoi](https://chezmoi.io) and lives in its git repo as `dot_local/share/context-engineering-knowledge-base/`. Edits are made to the chezmoi **source**, then `chezmoi apply` deploys them here — the deployed copy is never hand-edited. That makes the store reproducible on any machine and gives every change a recoverable history.

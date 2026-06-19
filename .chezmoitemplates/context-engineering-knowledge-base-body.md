@@ -4,9 +4,9 @@ A personal, version-controlled store of distilled **context-engineering** knowle
 
 The corpus is provider-neutral and shared; this skill is a thin entry point into it. The store lives at:
 
-- Index:   `~/.local/share/context-engineering-kb/INDEX.md`
-- Entries: `~/.local/share/context-engineering-kb/knowledge/<concept-slug>.md`
-- Helper:  `~/.local/share/context-engineering-kb/scripts/ce-kb`
+- Index:   `~/.local/share/context-engineering-knowledge-base/INDEX.md`
+- Entries: `~/.local/share/context-engineering-knowledge-base/knowledge/<concept-slug>.md`
+- Helper:  `~/.local/share/context-engineering-knowledge-base/scripts/ce-kb`
 
 **One mutation channel.** Read entries directly, but never hand-edit them to change the store. Every write goes through `ce-kb`, which edits the chezmoi source, runs `chezmoi apply`, and commits — so each change is one recoverable commit and the store stays self-consistent. The store changes only when you invoke `ce-kb`; nothing mutates it automatically or on a schedule.
 
@@ -28,7 +28,7 @@ When a reusable context-engineering insight is worth keeping:
 2. Author the entry and pipe it to the helper on stdin:
 
    ```sh
-   ~/.local/share/context-engineering-kb/scripts/ce-kb capture <slug> <<'EOF'
+   ~/.local/share/context-engineering-knowledge-base/scripts/ce-kb capture <slug> <<'EOF'
    ---
    name: <slug>
    description: <one line — a retrieval trigger: "load when…">
@@ -57,7 +57,7 @@ Refresh is manual and explicit — there is no automatic staleness check; the de
 4. Apply via the helper (it requires the entry to already exist):
 
    ```sh
-   ~/.local/share/context-engineering-kb/scripts/ce-kb refresh <slug> < updated-entry.md
+   ~/.local/share/context-engineering-knowledge-base/scripts/ce-kb refresh <slug> < updated-entry.md
    ```
 
 `refresh` overwrites the one canonical entry, keeping the slug stable, and commits. There is never a duplicate, and the prior version stays recoverable from git history.
