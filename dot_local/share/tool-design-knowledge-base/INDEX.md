@@ -9,3 +9,5 @@ Each line: `- [<practice-slug>](knowledge/<practice-slug>.md) — <one-line desc
 ## Practices
 
 <!-- one line per practice; appended by capture/refresh via scripts/td-kb -->
+
+- [tool-description-writing](knowledge/tool-description-writing.md) — Use when writing or reviewing the description/docstring of a tool an agent calls — stating its purpose, an explicit "use when", per-parameter meaning, in-description examples and usage limits, or disambiguating it from a near-twin tool.
