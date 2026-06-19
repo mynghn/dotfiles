@@ -23,6 +23,6 @@ echo "$input" | jq '
     "hooks": [{"type": "command", "command": "~/.claude/hooks/chezmoi-guard.sh"}]
   }, {
     "matcher": "Bash",
-    "hooks": [{"type": "command", "command": "~/.claude/hooks/gh-comment-attribution.sh", "statusMessage": "Checking GitHub comment attribution..."}]
+    "hooks": [{"type": "command", "command": "~/.claude/hooks/gh-comment-attribution.sh", "if": "Bash(gh *)", "statusMessage": "Checking GitHub comment attribution..."}]
   }]
 '
