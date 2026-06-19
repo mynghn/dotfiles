@@ -6,7 +6,6 @@ sources:
   - Anthropic, "Writing effective tools for agents — with agents", 2025 — https://www.anthropic.com/engineering/writing-tools-for-agents
   - Anthropic, "Building effective agents" (Appendix 2: Prompt engineering your tools), 2024 — https://www.anthropic.com/engineering/building-effective-agents
   - Model Context Protocol, "Tools" specification (2025-06-18), 2025 — https://modelcontextprotocol.io/specification/2025-06-18/server/tools
-  - OpenAI, "A Practical Guide to Building Agents", 2025 — https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf
 ---
 
 **What it is.** The tool's *name* is the primary selection key the model reads when deciding which function to call — and, under MCP, the literal `name` field functions as the tool's unique identifier passed in `tools/call`, so it carries both semantic and protocol weight (MCP spec, 2025). This practice covers two levers: (1) clear, action-oriented names that say what one tool does, and (2) namespacing — shared prefixes that group tools by service or resource and prevent collisions across a crowded or multi-server tool set.
