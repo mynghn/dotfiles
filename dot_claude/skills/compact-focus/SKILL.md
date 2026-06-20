@@ -13,7 +13,7 @@ Tailor it to the actual session — name the real items, do not emit a generic t
 - **Drop**: resolved tangents, dead ends, verbose tool output, superseded attempts.
 - Smallest high-signal summary that still lets the work continue.
 
-Lay it out as labeled blocks — `Keep:` / `Verbatim:` / `Refs:` / `Drop:`, each on its own line(s), one directive per line — never a run-on wall. Terse content, explicit structure: a clearly delimited focus is followed more reliably by the summarizer (a dense paragraph forces it to infer section boundaries and risks dropping directives), and stays sanity-checkable at a glance.
+Lay it out as labeled blocks — `Keep:` / `Verbatim:` / `Refs:` / `Drop:`, each on its own line(s), one directive per line — split any `;`-chained facts, since a packed `Keep:` line is the run-on wall in disguise. Terse content, explicit structure: a clearly delimited focus is followed more reliably by the summarizer (a dense paragraph forces it to infer section boundaries and risks dropping directives), and stays sanity-checkable at a glance.
 
 Write the prose in the language the user uses in their own prompts (not the session aggregate — model output, loaded docs, and code skew English); keep technical anchors — paths, identifiers, code, SHAs, proto names — verbatim.
 
