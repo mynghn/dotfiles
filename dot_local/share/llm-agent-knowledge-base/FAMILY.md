@@ -22,7 +22,7 @@ The field's own stack (Osmani, 2026): **prompt → context → harness → loop*
 
 ## Family
 
-Ordered by **universality** — how many agent tasks the knowledge benefits. This is the build-priority lens and the discovery-wiring rule in one: an **Everyday** concern earns an always-loaded `AGENTS.md` Layer-1 trigger block; **Common** and **Situational** ones rely on the `SKILL.md` description (which costs nothing until the work matches). Build status is inline; the `prompt → context → harness → loop` stack lens lives under *Validated layering* above.
+Ordered by **universality** — how many agent tasks the knowledge benefits. Universality fixes the **discovery-wiring** rule — an **Everyday** concern earns an always-loaded `AGENTS.md` Layer-1 trigger block; **Common** and **Situational** ones rely on the `SKILL.md` description (which costs nothing until the work matches) — and sets the **default build priority**. Build-order may deviate from tier when a topic's primary sources are especially ripe or it is hit unusually often. Build status is inline; the `prompt → context → harness → loop` stack lens lives under *Validated layering* above.
 
 ### Everyday — universal, ~every agent turn (warrants a Layer-1 trigger block)
 | Sibling stem | Status | Scope | Boundary |
@@ -33,7 +33,7 @@ Ordered by **universality** — how many agent tasks the knowledge benefits. Thi
 ### Common — whenever you build or operate an agent
 | Sibling stem | Status | Scope | Boundary |
 |---|---|---|---|
-| **agent-architectures** | planned | Control flow & orchestration — workflows vs autonomous loop, ReAct, reflection, routing, single/multi-agent; absorbs loop-engineering's control envelope | control flow vs runtime *execution* (agent-runtime) |
+| **agent-architectures** | planned | Control flow & orchestration — workflows vs autonomous loop, ReAct, reflection, routing, single/multi-agent, sub-agent design; absorbs loop-engineering's control envelope | control flow vs runtime *execution* (agent-runtime) |
 | **evaluation-observability** | planned | Eval-driven dev, LLM-as-judge, eval harnesses, tracing | measuring vs runtime *enforcement* (guardrails) |
 | **agent-runtime** *(alias: agent-harness / harness)* | planned | The execution layer — loop driver/runtime, tool dispatch, retries/idempotency, state & restart-survival, sandboxing, session persistence, triggers/budgets/runaway-guards | runtime *execution* vs control-flow *patterns* (architectures) & window mgmt (context) |
 
@@ -41,12 +41,15 @@ Ordered by **universality** — how many agent tasks the knowledge benefits. Thi
 | Sibling stem | Status | Scope | Boundary |
 |---|---|---|---|
 | **tool-design** | built (10, `0003-tool-design-knowledge-base`) | the tool/function contract — descriptions, input/output schemas, granularity & consolidation, naming/namespacing, high-signal & token-efficient returns, error design, structured output, tool evals; absorbs structured-output | the tool contract vs instruction-wording (prompt-engineering) & what occupies the window (context-engineering); tool surface vs how tools are sequenced (architectures) |
+| **skill-design** | planned · next build | the skill abstraction (SKILL.md) — progressive disclosure / three-tier token economics, directory packaging (scripts/references/assets), in-context activation, description-as-activation-trigger, one-capability granularity, instructions-body craft; the skill vs tool vs prompt vs sub-agent boundary | description/naming/selection-among-many delegated to tool-design (shared seam, single owner); the body's instruction-wording → prompt-engineering; sub-agent design → agent-architectures |
 | **memory-state** | planned | Cross-session persistence + recall — short/long-term, semantic/episodic/procedural, write/consolidation | *across windows* vs *this window* (context) |
 | **retrieval-rag** | planned | Fetch + rank external knowledge — chunking, embeddings, hybrid, rerank, contextual retrieval | *fetch* vs *place in window* (context) |
 | **guardrails-safety-security** | planned | I/O validation, prompt-injection defense, permissions/sandboxing, excessive-agency (OWASP LLM Top 10) | runtime *enforcement* vs *measurement* (eval) |
 | **cost-latency** | planned | Model routing, cache economics, token budgeting, batching, streaming | cache-as-*cost-lever* vs cache-as-*context-stability* (context) |
 
 `agent-runtime` was **promoted from "deferred"** once the 2026 harness-engineering literature supplied the primary sources it had lacked.
+
+`skill-design` is **Situational** by universality (build-time, not every-turn → description-only discovery) yet the **recommended next build**: its spec is mature now (`agentskills.io` + Anthropic Agent Skills docs) and fast-moving, so best captured current, and skill-authoring is a high-frequency activity here — which lifts its build-order above the higher-universality Common siblings. The shared description/naming/selection seam stays owned by `tool-design` (cross-reference, don't duplicate). Admission grounded in a 2026-06-20 SOTA pass (Anthropic Agent Skills docs + agentskills.io open standard + arXiv:2602.20867 SoK, which formalizes a skill as a 4-tuple) — confirmed coherent, closeable, primary-source-backed, and non-overlapping with tool-design and prompt-engineering.
 
 ### Excluded
 - **fine-tuning / model-adaptation** — model training, not agent building.
