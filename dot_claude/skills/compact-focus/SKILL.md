@@ -3,7 +3,7 @@ name: compact-focus
 description: Generate a session-tailored `/compact <focus>` line so manual compaction keeps the working set and drops noise, in the context-engineering-knowledge-base spirit. Use when the user asks to compact, clear, or condense the session, before a long context-heavy task, or to hand the user a focused compaction command. The user runs /compact; you cannot.
 ---
 
-Produce a single ready-to-paste `/compact <focus>` command line that compacts THIS conversation well, following the `<compaction>` policy in the global instructions (load `~/.local/share/context-engineering-knowledge-base/knowledge/compaction-vs-eviction.md` and its siblings if you need the full reasoning).
+Produce a single ready-to-paste `/compact <focus>` command line that compacts THIS conversation well, following the `<compaction>` policy in the global instructions (load `~/.local/share/llm-agent-knowledge-vault/context-engineering/knowledge/compaction-vs-eviction.md` and its siblings if you need the full reasoning).
 
 Tailor it to the actual session — name the real items, do not emit a generic template:
 
