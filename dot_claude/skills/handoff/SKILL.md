@@ -4,7 +4,7 @@ description: Generate a goal-scoped handoff brief (+ a fresh-session kickoff lin
 argument-hint: "<the new goal the fresh session will pursue>"
 ---
 
-Produce a durable handoff brief for a FRESH session departing toward an explicit new goal — NOT a summary of this session. Ground it in the KB (load `~/.local/share/llm-agent-knowledge-vault/context-engineering/knowledge/explore-execute-boundary.md` and its siblings if you need the full reasoning).
+Produce a durable handoff brief for a FRESH session departing toward an explicit new goal — NOT a summary of this session. Ground it in the KB (load `~/.local/share/metacognition-vault/context-engineering/knowledge/explore-execute-boundary.md` and its siblings if you need the full reasoning).
 
 **Goal first.** The new goal is the organizing input. If `$ARGUMENTS` names it, use it; otherwise ask for it before writing — selection is meaningless without a destination. If the "new goal" is really "keep doing the same thing," stop and recommend `/compact-focus` instead (continuity, not departure).
 
