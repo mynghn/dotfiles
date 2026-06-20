@@ -6,7 +6,7 @@
 # is cloned only when missing, and the installer is safe to re-run — so on a machine
 # that already has the repos (e.g. the maintainer's) the clones are skipped and the
 # install is a no-op. The engine then mutates the vault directly; chezmoi never hosts
-# the family content (DESIGN Decision-6). URLs are overridable for forks / testing.
+# the family content. URLs are overridable for forks / testing.
 set -euo pipefail
 
 share="$HOME/.local/share"
