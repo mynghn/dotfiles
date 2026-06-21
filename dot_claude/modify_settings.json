@@ -7,7 +7,9 @@ if [ -z "$input" ]; then
   input='{}'
 fi
 
-echo "$input" | jq '
+# jq always appends a trailing newline; Claude Code writes settings.json WITHOUT
+# one, so emit no trailing newline to keep chezmoi's target == the live file.
+printf '%s' "$(echo "$input" | jq '
   .statusLine = {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -28,4 +30,4 @@ echo "$input" | jq '
     "matcher": "mcp__plugin_github_github__(add_issue_comment|add_comment_to_pending_review|add_reply_to_pull_request_comment|pull_request_review_write)",
     "hooks": [{"type": "command", "command": "~/.claude/hooks/gh-comment-attribution.sh", "statusMessage": "Checking GitHub comment attribution..."}]
   }]
-'
+')"
