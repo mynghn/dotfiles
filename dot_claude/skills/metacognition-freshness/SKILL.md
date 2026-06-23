@@ -1,10 +1,10 @@
 ---
 name: metacognition-freshness
-description: Check and (after confirmation) update the freshness and validity of the Metacognition framework — the tooling repo and the private vault repo (vs their remotes), plus whether installed Claude+Codex adapters cover every configured sibling. Use after a Metacognition main-branch update, when siblings/entries may be stale, or to confirm the framework is current. Metacognition is install-bootstrapped, NOT a chezmoi external — update via git pull + re-run install, not chezmoi. For chezmoi/dotfiles/LeanPlan use chezmoi-freshness instead.
+description: Check and (after confirmation) update the freshness and validity of the Metacognition framework — the tooling repo and the private vault repo (vs their remotes), plus whether installed Claude+Codex adapters cover every configured sibling. Use after a Metacognition main-branch update, when siblings/entries may be stale, or to confirm the framework is current. Metacognition is install-bootstrapped, NOT a chezmoi external — update via git pull + re-run install, not chezmoi. For the chezmoi-managed dotfiles surface use chezmoi-freshness instead.
 argument-hint: "[check | update]"
 ---
 
-The **Metacognition surface** of this machine's agent toolchain: the `metacognition` tooling repo + the private `metacognition-vault` repo, and the installed Claude+Codex KB adapters. Mechanism is imperative — `git pull` + re-run `install`. It is **not** a chezmoi external, so `chezmoi update` will never touch it. (The chezmoi/dotfiles/LeanPlan surface is owned by `chezmoi-freshness`.)
+The **Metacognition surface** of this machine's agent toolchain: the `metacognition` tooling repo + the private `metacognition-vault` repo, and the installed Claude+Codex KB adapters. Mechanism is imperative — `git pull` + re-run `install`. It is **not** a chezmoi external, so `chezmoi update` will never touch it. (The chezmoi-managed dotfiles surface is owned by `chezmoi-freshness`.)
 
 **Read-first, confirmed-update.** Run the check, show the verdict, then update only if it flags `**`, and only after the user confirms.
 

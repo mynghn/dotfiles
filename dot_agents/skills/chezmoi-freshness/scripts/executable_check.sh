@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # chezmoi-freshness — read-only freshness + validity of the CHEZMOI surface:
-# the dotfiles source repo, apply-drift, and EVERY chezmoi git-repo external
-# (e.g. the LeanPlan skills) checked against its real remote.
+# the dotfiles source repo, apply-drift, and every configured chezmoi git-repo
+# external checked against its real remote.
 #
 # WHY beyond `chezmoi status`: it reports an external as clean until its
 # refreshPeriod elapses, so it HIDES upstream commits. This fetches and
@@ -36,7 +36,7 @@ else echo "[apply  ] ** pending drift (chezmoi apply would change):"; echo "$st"
 
 SRC="$(chezmoi source-path)"; s="$(sync_state "$SRC")"; echo "[source ]$(flag "$s") $s  ($SRC)"
 
-# every git-repo external vs its remote (generalises past LeanPlan to any future external)
+# every git-repo external vs its remote
 EXT="$SRC/.chezmoiexternal.toml"
 if [ -f "$EXT" ]; then
   awk -F'"' '/^\[".*"\]/{p=$2} /type[ \t]*=[ \t]*"git-repo"/{print p}' "$EXT" | while read -r path; do
@@ -47,6 +47,6 @@ if [ -f "$EXT" ]; then
 else echo "[ext    ]  none (.chezmoiexternal.toml absent)"; fi
 
 echo "========================================================================"
-echo "Fix (after review, only if flagged **):  chezmoi update --refresh-externals"
+echo "Fix (after review, only if flagged **):  chezmoi update  (add --refresh-externals only when an external is flagged)"
 echo "  cosmetic settings.json drift -> ignore, or: chezmoi re-add ~/.claude/settings.json"
 echo "  (pushing a mynghn-owned external/repo needs the mynghn gh-credential override — see SKILL.md)"
