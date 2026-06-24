@@ -17,7 +17,15 @@ eval $(echo "$input" | jq -r '
       (100 - (.context_window.total_input_tokens * 100 / .context_window.context_window_size)) | floor
     else
       ""
-    end | tostring | @sh)"
+    end | tostring | @sh)",
+  # Subscription rate-limit quota (Pro/Max only, absent until first API
+  # response of a session — so every field degrades to "" gracefully).
+  "q5_pct=\(.rate_limits.five_hour.used_percentage // "" | tostring | @sh)",
+  "q5_reset=\(.rate_limits.five_hour.resets_at // "" | tostring | @sh)",
+  "q7_pct=\(.rate_limits.seven_day.used_percentage // "" | tostring | @sh)",
+  "q7_reset=\(.rate_limits.seven_day.resets_at // "" | tostring | @sh)",
+  "in_tok=\(.context_window.total_input_tokens // "" | tostring | @sh)",
+  "cost=\(.cost.total_cost_usd // "" | tostring | @sh)"
 ' 2>/dev/null) || { echo "Claude Code"; exit 0; }
 
 # Colors
@@ -32,6 +40,19 @@ D='\033[90m'
 
 # Separator
 S=" ${D}│${R} "
+
+# Humanize a raw token count: 285000 -> 285k, 1250000 -> 1.2M, 850 -> 850.
+human_tok() {
+    local n=${1%.*}
+    [ -z "$n" ] || [ "$n" = "null" ] && return
+    if [ "$n" -ge 1000000 ] 2>/dev/null; then
+        printf '%d.%dM' $((n / 1000000)) $(((n % 1000000) / 100000))
+    elif [ "$n" -ge 1000 ] 2>/dev/null; then
+        printf '%dk' $((n / 1000))
+    elif [ "$n" -ge 0 ] 2>/dev/null; then
+        printf '%d' "$n"
+    fi
+}
 
 # Build output
 out="${B}user:${USER:-$(whoami)}${R}"
@@ -93,17 +114,78 @@ fi
 
 # Model
 [ -n "$model" ] && out+="${S}${O}model:${model}${R}"
+
+# Effort level (not in stdin payload — read from settings; local overrides global).
+# Color escalates with cost: low=dim, medium=green, high=orange, xhigh/max=red.
+effort=""
+for sf in "$HOME/.claude/settings.local.json" "$HOME/.claude/settings.json"; do
+    [ -f "$sf" ] || continue
+    effort=$(jq -r '.effortLevel // empty' "$sf" 2>/dev/null)
+    [ -n "$effort" ] && break
+done
+if [ -n "$effort" ]; then
+    case "$effort" in
+        low)    ecol="$D" ;;
+        medium) ecol="$G" ;;
+        high)   ecol="$O" ;;
+        *)      ecol='\033[31m' ;;
+    esac
+    out+="${S}${ecol}effort:${effort}${R}"
+fi
 # Context remaining
 if [ -n "$context_remaining" ] && [ "$context_remaining" != "null" ] && [ "$context_remaining" != "" ]; then
     ctx=${context_remaining%.*}
     if [ "$ctx" -ge 70 ] 2>/dev/null; then
-        out+="${S}${G}ctx:${ctx}%${R}"
+        out+="${S}${G}ctx/left:${ctx}%${R}"
     elif [ "$ctx" -ge 30 ] 2>/dev/null; then
-        out+="${S}${Y}ctx:${ctx}%${R}"
+        out+="${S}${Y}ctx/left:${ctx}%${R}"
     else
-        out+="${S}\033[31mctx:${ctx}%${R}"
+        out+="${S}\033[31mctx/left:${ctx}%${R}"
     fi
 fi
+
+# Tokens occupying the context window (dim — secondary metric)
+itok=$(human_tok "$in_tok")
+[ -n "$itok" ] && out+="${S}${D}ctx/token:${itok}${R}"
+
+# Session cost estimate
+if [ -n "$cost" ] && [ "$cost" != "null" ]; then
+    costfmt=$(printf '%.2f' "$cost" 2>/dev/null)
+    [ -n "$costfmt" ] && out+="${S}${G}spent:\$${costfmt}${R}"
+fi
+
+# Quota: render a used-percentage segment (color inverted vs ctx — low used is
+# good). Append a reset countdown only when near the limit (>=80%), so the
+# common case stays compact. Silently skips when the field is absent.
+render_quota() {
+    local label="$1" pct="$2" reset="$3"
+    [ -z "$pct" ] || [ "$pct" = "null" ] && return
+    local p=${pct%.*}                       # floor float -> int
+    [ -z "$p" ] && return
+    local col
+    if [ "$p" -lt 50 ] 2>/dev/null; then col="$G"
+    elif [ "$p" -lt 80 ] 2>/dev/null; then col="$Y"
+    else col='\033[31m'; fi
+    local seg="${label}:${p}%"
+    if [ "$p" -ge 80 ] 2>/dev/null && [ -n "$reset" ] && [ "$reset" != "null" ]; then
+        local now delta r=${reset%.*}
+        now=$(date +%s)
+        delta=$((r - now))
+        if [ "$delta" -gt 0 ]; then
+            local d=$((delta / 86400)) h=$(((delta % 86400) / 3600)) m=$(((delta % 3600) / 60))
+            if [ "$d" -gt 0 ]; then
+                seg+=" ↻${d}d${h}h"
+            elif [ "$h" -gt 0 ]; then
+                seg+=$(printf ' ↻%dh%02dm' "$h" "$m")
+            else
+                seg+=" ↻${m}m"
+            fi
+        fi
+    fi
+    out+="${S}${col}${seg}${R}"
+}
+render_quota "quota/5h" "$q5_pct" "$q5_reset"
+render_quota "quota/1w" "$q7_pct" "$q7_reset"
 
 # AWS Profile
 [ -n "$AWS_PROFILE" ] && out+="${S}${M}aws:${AWS_PROFILE}${R}"
