@@ -64,6 +64,11 @@ human_tok() {
 line1=""; line2=""; line3=""
 line1+="${S}${B}user:${USER:-$(whoami)}${R}"
 
+# Logged-in Anthropic account (email) from the CLI config — paired with the
+# local user as the identity group. Absent/skipped when not signed in.
+acct=$(jq -r '.oauthAccount.emailAddress // empty' "$HOME/.claude.json" 2>/dev/null)
+[ -n "$acct" ] && line1+="${S}${B}acct:${acct}${R}"
+
 # Directory (abbreviate home as ~, smart truncation)
 if [ "$cwd" = "$HOME" ]; then
     dir="~"
