@@ -37,6 +37,7 @@ B='\033[34m'
 M='\033[35m'
 O='\033[38;5;208m'
 D='\033[90m'
+P='\033[38;5;141m'
 
 # Separator
 S=" ${D}│${R} "
@@ -54,8 +55,14 @@ human_tok() {
     fi
 }
 
-# Build output
-out="${B}user:${USER:-$(whoami)}${R}"
+# Build output across three lines:
+#   line1: identity/location/model  (user, cwd, git, model, effort)
+#   line2: budgets                  (ctx/*, quota/*, spent)
+#   line3: environment              (aws, k8s)
+# Every segment is appended WITH a leading separator; each line's leading
+# separator is stripped just before printing.
+line1=""; line2=""; line3=""
+line1+="${S}${B}user:${USER:-$(whoami)}${R}"
 
 # Directory (abbreviate home as ~, smart truncation)
 if [ "$cwd" = "$HOME" ]; then
@@ -99,7 +106,7 @@ if [ ${#dir} -gt 30 ]; then
         dir="$result"
     fi
 fi
-out+="${S}${C}cwd:${dir}${R}"
+line1+="${S}${C}cwd:${dir}${R}"
 
 # Git branch (only if .git exists - fast check)
 if [ -d "${cwd}/.git" ] || [ -d "${project_dir}/.git" ]; then
@@ -108,50 +115,33 @@ if [ -d "${cwd}/.git" ] || [ -d "${project_dir}/.git" ]; then
     if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
         # Truncate branch name if > 30 chars
         [ ${#branch} -gt 30 ] && branch="${branch:0:29}…"
-        out+="${S}${C}git:${branch}${R}"
+        line1+="${S}${C}git:${branch}${R}"
     fi
 fi
 
 # Model
-[ -n "$model" ] && out+="${S}${O}model:${model}${R}"
+[ -n "$model" ] && line1+="${S}${O}model:${model}${R}"
 
 # Effort level (not in stdin payload — read from settings; local overrides global).
-# Color escalates with cost: low=dim, medium=green, high=orange, xhigh/max=red.
+# Shares the model color since both describe how the model runs.
 effort=""
 for sf in "$HOME/.claude/settings.local.json" "$HOME/.claude/settings.json"; do
     [ -f "$sf" ] || continue
     effort=$(jq -r '.effortLevel // empty' "$sf" 2>/dev/null)
     [ -n "$effort" ] && break
 done
-if [ -n "$effort" ]; then
-    case "$effort" in
-        low)    ecol="$D" ;;
-        medium) ecol="$G" ;;
-        high)   ecol="$O" ;;
-        *)      ecol='\033[31m' ;;
-    esac
-    out+="${S}${ecol}effort:${effort}${R}"
-fi
-# Context remaining
+[ -n "$effort" ] && line1+="${S}${O}effort:${effort}${R}"
+
+# Context family (ctx/left + ctx/token) — both share a green->yellow->red color
+# keyed on remaining headroom: lots of room green, nearly full red.
 if [ -n "$context_remaining" ] && [ "$context_remaining" != "null" ] && [ "$context_remaining" != "" ]; then
     ctx=${context_remaining%.*}
-    if [ "$ctx" -ge 70 ] 2>/dev/null; then
-        out+="${S}${G}ctx/left:${ctx}%${R}"
-    elif [ "$ctx" -ge 30 ] 2>/dev/null; then
-        out+="${S}${Y}ctx/left:${ctx}%${R}"
-    else
-        out+="${S}\033[31mctx/left:${ctx}%${R}"
-    fi
-fi
-
-# Tokens occupying the context window (dim — secondary metric)
-itok=$(human_tok "$in_tok")
-[ -n "$itok" ] && out+="${S}${D}ctx/token:${itok}${R}"
-
-# Session cost estimate
-if [ -n "$cost" ] && [ "$cost" != "null" ]; then
-    costfmt=$(printf '%.2f' "$cost" 2>/dev/null)
-    [ -n "$costfmt" ] && out+="${S}${G}spent:\$${costfmt}${R}"
+    if [ "$ctx" -ge 70 ] 2>/dev/null; then ctxcol="$G"
+    elif [ "$ctx" -ge 30 ] 2>/dev/null; then ctxcol="$Y"
+    else ctxcol='\033[31m'; fi
+    line2+="${S}${ctxcol}ctx/left:${ctx}%${R}"
+    itok=$(human_tok "$in_tok")
+    [ -n "$itok" ] && line2+="${S}${ctxcol}ctx/token:${itok}${R}"
 fi
 
 # Quota: render a used-percentage segment (color inverted vs ctx — low used is
@@ -182,19 +172,33 @@ render_quota() {
             fi
         fi
     fi
-    out+="${S}${col}${seg}${R}"
+    line2+="${S}${col}${seg}${R}"
 }
 render_quota "quota/5h" "$q5_pct" "$q5_reset"
 render_quota "quota/1w" "$q7_pct" "$q7_reset"
 
+# Session cost estimate
+if [ -n "$cost" ] && [ "$cost" != "null" ]; then
+    costfmt=$(printf '%.2f' "$cost" 2>/dev/null)
+    [ -n "$costfmt" ] && line2+="${S}${P}spent:\$${costfmt}${R}"
+fi
+
 # AWS Profile
-[ -n "$AWS_PROFILE" ] && out+="${S}${M}aws:${AWS_PROFILE}${R}"
+[ -n "$AWS_PROFILE" ] && line3+="${S}${M}aws:${AWS_PROFILE}${R}"
 
 # Kubernetes context (check KUBECONFIG or default location)
 kubeconfig="${KUBECONFIG:-$HOME/.kube/config}"
 if [ -f "$kubeconfig" ]; then
     kctx=$(grep -m1 'current-context:' "$kubeconfig" 2>/dev/null | awk '{print $2}')
-    [ -n "$kctx" ] && [ "$kctx" != "docker-desktop" ] && out+="${S}${M}k8s:${kctx}${R}"
+    [ -n "$kctx" ] && [ "$kctx" != "docker-desktop" ] && line3+="${S}${M}k8s:${kctx}${R}"
 fi
 
+# Strip each line's leading separator, then emit non-empty lines (one per row).
+out=""
+for ln in "$line1" "$line2" "$line3"; do
+    ln=${ln#"$S"}
+    [ -n "$ln" ] || continue
+    [ -n "$out" ] && out+=$'\n'
+    out+="$ln"
+done
 printf '%b\n' "$out"
