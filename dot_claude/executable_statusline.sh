@@ -154,14 +154,15 @@ done
 ostyle=$(echo "$input" | jq -r '(.output_style | if type=="object" then .name else . end) // empty' 2>/dev/null)
 [ -n "$ostyle" ] && line1+="${S}${O}style:${ostyle}${R}"
 
-# Context: one segment ctx:<left%>(<used>/<size>), green->yellow->red on
-# remaining headroom (lots of room green, nearly full red).
+# Context: one segment ctx:<used%>(<used>/<size>), green->yellow->red on how
+# full the window is (nearly empty green, nearly full red).
 if [ -n "$context_remaining" ] && [ "$context_remaining" != "null" ] && [ "$context_remaining" != "" ]; then
     ctx=${context_remaining%.*}
-    if [ "$ctx" -ge 70 ] 2>/dev/null; then ctxcol="$G"
-    elif [ "$ctx" -ge 30 ] 2>/dev/null; then ctxcol="$Y"
+    used=$((100 - ctx))
+    if [ "$used" -le 30 ] 2>/dev/null; then ctxcol="$G"
+    elif [ "$used" -le 70 ] 2>/dev/null; then ctxcol="$Y"
     else ctxcol='\033[31m'; fi
-    ctxseg="ctx:${ctx}%"
+    ctxseg="ctx:${used}%"
     itok=$(human_tok "$in_tok"); wsz=$(human_tok "$win_size")
     if [ -n "$itok" ] && [ -n "$wsz" ]; then ctxseg+="(${itok}/${wsz})"
     elif [ -n "$itok" ]; then ctxseg+="(${itok})"; fi
