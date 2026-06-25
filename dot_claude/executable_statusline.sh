@@ -5,8 +5,8 @@ input=$(cat)
 
 # Extract data with single jq call (calculate context % from tokens if not provided)
 eval $(echo "$input" | jq -r '
-  "cwd=\(.workspace.current_dir | @sh)",
-  "project_dir=\(.workspace.project_dir | @sh)",
+  "cwd=\(.workspace.current_dir // "" | @sh)",
+  "project_dir=\(.workspace.project_dir // "" | @sh)",
   "model=\(.model.display_name // "" | @sh)",
   "context_remaining=\(
     if .context_window.remaining_percentage then
@@ -60,6 +60,39 @@ human_tok() {
     fi
 }
 
+# Abbreviate a path for display: home -> ~, then collapse middle dirs if the
+# result exceeds 30 chars (keeps first/last, preserves full names).
+abbrev_dir() {
+    local p="$1" dir
+    if [ "$p" = "$HOME" ]; then
+        dir="~"
+    elif [[ "$p" == "$HOME"/* ]]; then
+        dir="~/${p#$HOME/}"
+    else
+        dir="$p"
+    fi
+    if [ ${#dir} -gt 30 ]; then
+        local parts len excess avg_per_dir to_remove keep first_half last_half result i
+        IFS='/' read -ra parts <<< "$dir"
+        len=${#parts[@]}
+        if [ $len -gt 3 ]; then
+            excess=$((${#dir} - 30))
+            avg_per_dir=$(( ${#dir} / len )); [ $avg_per_dir -lt 1 ] && avg_per_dir=1
+            to_remove=$(( (excess / avg_per_dir) + 1 ))
+            keep=$((len - to_remove)); [ $keep -lt 3 ] && keep=3
+            first_half=$(( (keep - 1) / 2 )); last_half=$(( keep - first_half - 1 ))
+            [ $first_half -lt 1 ] && first_half=1
+            [ $last_half -lt 1 ] && last_half=1
+            result="${parts[0]}"
+            for ((i=1; i<first_half; i++)); do result+="/${parts[$i]}"; done
+            result+="/…"
+            for ((i=len-last_half; i<len; i++)); do result+="/${parts[$i]}"; done
+            dir="$result"
+        fi
+    fi
+    printf '%s' "$dir"
+}
+
 # Build output across three lines:
 #   line1: identity/location/model  (user, cwd, git, model, effort)
 #   line2: budgets                  (ctx/*, quota/*, spent)
@@ -79,49 +112,12 @@ fi
 tier=$(jq -r '.oauthAccount.userRateLimitTier // empty' "$HOME/.claude.json" 2>/dev/null \
        | sed -e 's/^default_//' -e 's/^claude_//' -e 's/_//g')
 
-# Directory (abbreviate home as ~, smart truncation)
-if [ "$cwd" = "$HOME" ]; then
-    dir="~"
-elif [[ "$cwd" == "$HOME"/* ]]; then
-    dir="~/${cwd#$HOME/}"
-else
-    dir="$cwd"
+# Workspace = the launch/project dir (always shown). cwd is shown only when the
+# live working directory has drifted away from the workspace.
+[ -n "$project_dir" ] && line1+="${S}${C}workspace:$(abbrev_dir "$project_dir")${R}"
+if [ -n "$cwd" ] && [ "$cwd" != "$project_dir" ]; then
+    line1+="${S}${C}cwd:$(abbrev_dir "$cwd")${R}"
 fi
-
-# Smart truncation if > 30 chars: collapse middle directories, preserve full names
-if [ ${#dir} -gt 30 ]; then
-    # Split into parts
-    IFS='/' read -ra parts <<< "$dir"
-    len=${#parts[@]}
-
-    if [ $len -gt 3 ]; then
-        # Single-pass: calculate how many dirs to keep based on average length
-        excess=$((${#dir} - 30))
-        avg_per_dir=$(( ${#dir} / len ))
-        [ $avg_per_dir -lt 1 ] && avg_per_dir=1
-        to_remove=$(( (excess / avg_per_dir) + 1 ))
-        keep=$((len - to_remove))
-        [ $keep -lt 3 ] && keep=3
-
-        # Keep first half and last half, collapse middle
-        first_half=$(( (keep - 1) / 2 ))
-        last_half=$(( keep - first_half - 1 ))
-        [ $first_half -lt 1 ] && first_half=1
-        [ $last_half -lt 1 ] && last_half=1
-
-        # Build: first_half dirs + … + last_half dirs
-        result="${parts[0]}"
-        for ((i=1; i<first_half; i++)); do
-            result+="/${parts[$i]}"
-        done
-        result+="/…"
-        for ((i=len-last_half; i<len; i++)); do
-            result+="/${parts[$i]}"
-        done
-        dir="$result"
-    fi
-fi
-line1+="${S}${C}cwd:${dir}${R}"
 
 # Git branch + worktree. Use -e (not -d): a linked worktree's .git is a FILE.
 if [ -e "${cwd}/.git" ] || [ -e "${project_dir}/.git" ]; then
@@ -144,10 +140,6 @@ fi
 # Model
 [ -n "$model" ] && line1+="${S}${O}model:${model}${R}"
 
-# Output style (payload field is either an object {name} or a plain string)
-ostyle=$(echo "$input" | jq -r '(.output_style | if type=="object" then .name else . end) // empty' 2>/dev/null)
-[ -n "$ostyle" ] && line1+="${S}${O}style:${ostyle}${R}"
-
 # Effort level (not in stdin payload — read from settings; local overrides global).
 # Shares the model color since both describe how the model runs.
 effort=""
@@ -157,6 +149,10 @@ for sf in "$HOME/.claude/settings.local.json" "$HOME/.claude/settings.json"; do
     [ -n "$effort" ] && break
 done
 [ -n "$effort" ] && line1+="${S}${O}effort:${effort}${R}"
+
+# Output style next to effort (payload field is either an object {name} or a string)
+ostyle=$(echo "$input" | jq -r '(.output_style | if type=="object" then .name else . end) // empty' 2>/dev/null)
+[ -n "$ostyle" ] && line1+="${S}${O}style:${ostyle}${R}"
 
 # Context: one segment ctx:<left%>(<used>/<size>), green->yellow->red on
 # remaining headroom (lots of room green, nearly full red).
