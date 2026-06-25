@@ -119,22 +119,22 @@ if [ -n "$cwd" ] && [ "$cwd" != "$project_dir" ]; then
     line1+="${S}${C}cwd:$(abbrev_dir "$cwd")${R}"
 fi
 
-# Git branch + worktree. Use -e (not -d): a linked worktree's .git is a FILE.
+# Git worktree + branch. Use -e (not -d): a linked worktree's .git is a FILE.
 if [ -e "${cwd}/.git" ] || [ -e "${project_dir}/.git" ]; then
     gitdir="${cwd}"
     [ -e "${project_dir}/.git" ] && gitdir="${project_dir}"
-    if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
-        # Truncate branch name if > 30 chars
-        [ ${#branch} -gt 30 ] && branch="${branch:0:29}…"
-        line1+="${S}${C}git:${branch}${R}"
-    fi
-    # Linked worktree: the absolute git dir is <repo>/.git/worktrees/<name>.
+    # Linked worktree (left of branch): admin name from <repo>/.git/worktrees/<name>.
     # Main worktree has no /worktrees/ segment, so this shows only when relevant.
     gd=$(git -C "$gitdir" rev-parse --absolute-git-dir 2>/dev/null)
     case "$gd" in
         */worktrees/*) wt="${gd##*/worktrees/}"; wt="${wt%%/*}"
                        line1+="${S}${M}wt:${wt}${R}" ;;
     esac
+    if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
+        # Truncate branch name if > 30 chars
+        [ ${#branch} -gt 30 ] && branch="${branch:0:29}…"
+        line1+="${S}${C}branch:${branch}${R}"
+    fi
 fi
 
 # Model
