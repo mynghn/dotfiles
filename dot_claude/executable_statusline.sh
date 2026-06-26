@@ -204,11 +204,11 @@ render_quota() {
         if [ "$delta" -gt 0 ]; then
             local d=$((delta / 86400)) h=$(((delta % 86400) / 3600)) m=$(((delta % 3600) / 60))
             if [ "$d" -gt 0 ]; then
-                seg+=" ↻${d}d${h}h"
+                seg+=" ↻ ${d}d${h}h"
             elif [ "$h" -gt 0 ]; then
-                seg+=$(printf ' ↻%dh%02dm' "$h" "$m")
+                seg+=$(printf ' ↻ %dh%02dm' "$h" "$m")
             else
-                seg+=" ↻${m}m"
+                seg+=" ↻ ${m}m"
             fi
         fi
     fi
