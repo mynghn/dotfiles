@@ -8,6 +8,7 @@ eval $(echo "$input" | jq -r '
   "cwd=\(.workspace.current_dir // "" | @sh)",
   "project_dir=\(.workspace.project_dir // "" | @sh)",
   "model=\(.model.display_name // "" | @sh)",
+  "effort=\(.effort.level // "" | @sh)",
   "context_remaining=\(
     if .context_window.remaining_percentage then
       .context_window.remaining_percentage
@@ -128,7 +129,7 @@ if [ -e "${cwd}/.git" ] || [ -e "${project_dir}/.git" ]; then
     gd=$(git -C "$gitdir" rev-parse --absolute-git-dir 2>/dev/null)
     case "$gd" in
         */worktrees/*) wt="${gd##*/worktrees/}"; wt="${wt%%/*}"
-                       line1+="${S}${M}wt:${wt}${R}" ;;
+                       line1+="${S}${C}wt:${wt}${R}" ;;
     esac
     if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
         # Truncate branch name if > 30 chars
@@ -140,15 +141,12 @@ fi
 # Model
 [ -n "$model" ] && line1+="${S}${O}model:${model}${R}"
 
-# Effort level (not in stdin payload — read from settings; local overrides global).
+# Effort level (live session value from the payload — reflects mid-session
+# /effort changes and mode overrides like /goal, unlike settings.json's stale
+# effortLevel). Absent only when the model doesn't support the effort parameter.
+# "ultracode" is not a distinct level; it reports here as xhigh.
 # Shares the model color since both describe how the model runs.
-effort=""
-for sf in "$HOME/.claude/settings.local.json" "$HOME/.claude/settings.json"; do
-    [ -f "$sf" ] || continue
-    effort=$(jq -r '.effortLevel // empty' "$sf" 2>/dev/null)
-    [ -n "$effort" ] && break
-done
-[ -n "$effort" ] && line1+="${S}${O}effort:${effort}${R}"
+[ -n "$effort" ] && [ "$effort" != "null" ] && line1+="${S}${O}effort:${effort}${R}"
 
 # Output style next to effort (payload field is either an object {name} or a string)
 ostyle=$(echo "$input" | jq -r '(.output_style | if type=="object" then .name else . end) // empty' 2>/dev/null)
@@ -187,8 +185,8 @@ if [ -n "$cache_read" ] && [ "$cache_read" != "null" ]; then
 fi
 
 # Quota: render a used-percentage segment (color inverted vs ctx — low used is
-# good). Append a reset countdown only when near the limit (>=80%), so the
-# common case stays compact. Silently skips when the field is absent.
+# good), always followed by the reset countdown when a reset time is known.
+# Silently skips when the field is absent.
 render_quota() {
     local label="$1" pct="$2" reset="$3"
     [ -z "$pct" ] || [ "$pct" = "null" ] && return
@@ -199,7 +197,7 @@ render_quota() {
     elif [ "$p" -lt 80 ] 2>/dev/null; then col="$Y"
     else col='\033[31m'; fi
     local seg="${label}:${p}%"
-    if [ "$p" -ge 80 ] 2>/dev/null && [ -n "$reset" ] && [ "$reset" != "null" ]; then
+    if [ -n "$reset" ] && [ "$reset" != "null" ]; then
         local now delta r=${reset%.*}
         now=$(date +%s)
         delta=$((r - now))
