@@ -1,7 +1,8 @@
 # Illustrated explainer — playbook
 
-The heavy, reusable material for building an explainer Artifact. Load this when
-you reach steps 3–5. The running example throughout is a real one: an explainer
+The heavy, reusable material for building an explainer — usually a self-contained
+page. Load this when you reach steps 3–5 (and the Chart-craft / Earned-interactivity
+sections when a subject calls for them). The running example throughout is a real one: an explainer
 for a ledger engine that builds a graph of "what provably happened before what"
 and walks it — a subject with three states (proven order, concurrent/unproven,
 refused). Adapt the shapes; keep the discipline.
@@ -37,18 +38,19 @@ Method:
 
 5. *Then* load `artifact-design` for the type pairing, layout, spacing, and its
    anti-templating checklist. This skill decides the semantic palette;
-   `artifact-design` executes the craft around it. Avoid the current AI-design
-   clichés it warns about (cream + serif + terracotta; lone acid-green pop;
-   everything centered; rounded-everything).
+   `artifact-design` executes the craft around it — including steering clear of
+   the AI-design clichés it warns about (defer to its list, don't restate it).
 
 ---
 
-## The arc (step 4)
+## The arc (step 4) — a default to adapt, not a schema
 
-Order the page as a single narrative thread. Each section leads with a
-one-sentence claim (its heading or first line), and every term is defined the
-first time it appears. A good default sequence — drop or merge sections the
-subject doesn't need, never reorder past → present → why:
+Structure is *derived from the subject*, governed by the invariants and ordering
+constraints in the SKILL (define-before-use, problem-before-fix, trust-after-mechanism).
+The sequence below is a **default that usually satisfies those constraints** — adapt,
+drop, or merge sections to the subject; never reorder past → present → why. Order the
+page as a single narrative thread. Each section leads with a one-sentence claim (its
+heading or first line), and every term is defined the first time it appears:
 
 | # | Section | Its job | Test it passes |
 |---|---------|---------|----------------|
@@ -77,6 +79,12 @@ Rules of thumb:
 Prefer inline **SVG** for precise labeled structure (graphs, flows, before/after
 geometry) and **HTML/CSS** for card-style compares and legends. Keep every wide
 figure in its own scroll box. Copyable primitives below.
+
+**Before copying:** the hexes in these primitives are the running ledger example's
+state-palette — swap them for *this* subject's own colors (step 3). And they are
+light-only; for the theme-aware default, drive fills from CSS custom properties (or
+a `prefers-color-scheme` block) rather than the literal colors shown, so a copied
+figure survives in dark mode.
 
 ### Figure frame + scroll box
 
@@ -166,6 +174,88 @@ Diagram discipline:
 - Label with the subject's real vocabulary (mono font ties code-like terms together).
 - Every figure earns a caption that states the takeaway, not what's drawn.
 - `role="img"` + `aria-label` on each SVG; never rely on color alone (pair hue with shape/dashes/labels).
+
+---
+
+## Chart craft — when the subject is data (step 5)
+
+When the thing to show is a *dataset* (a trend, a comparison, a distribution), the
+encoding is craft in its own right. There is no self-contained chart *delegate* for
+this medium — the good chart skills either mandate a CDN library (fails the CSP) or
+render raster via Python. So **borrow the judgment and render it as inline SVG
+yourself.** The selection + honesty rules below are distilled from the
+`data-visualization` skill (`anthropics/knowledge-work-plugins`, model-invoked,
+medium-agnostic in its guidance).
+
+Pick the chart by the *relationship* you're showing:
+
+| Showing | Chart | Note |
+|---|---|---|
+| Trend over time | line (area if cumulative) | |
+| Comparison across categories | vertical bar; horizontal if many | |
+| Ranking | horizontal bar / dot plot | |
+| Part-to-whole | stacked bar; treemap if hierarchical | avoid pie unless <6 slices |
+| Distribution | histogram; box plot to compare groups | |
+| Correlation (2 vars) | scatter (bubble adds a 3rd) | |
+| Correlation (many) | heatmap | |
+| Flow / process | sankey / funnel | |
+
+Honesty rules — these are load-bearing; a misleading chart is an unfaithful omission
+in disguise:
+- **y-axis starts at zero** for bar charts; a truncated baseline exaggerates differences.
+- **No 3D, ever** — it distorts perception and adds no information.
+- **No pie/donut** beyond a rough <6-slice split — humans compare angles poorly; use a bar.
+- **Dual-axis with care** — it implies a correlation that may not exist; label both axes.
+- **Label directly** on the series where you can, instead of forcing a legend lookup.
+- **Colorblind-safe** encoding; never carry meaning by hue alone (pair with shape/label/position).
+
+Render with the SVG primitives above (axes as `<line>`, bars/points as `<rect>` /
+`<circle>`, labels as `<text>`), and keep the state-palette from step 3 so the chart
+reads in the same language as the rest of the page.
+
+---
+
+## Earned interactivity (step 5)
+
+Interactivity is welcome *only when it does explanatory work* — letting the reader
+step the mechanism, drive the hard case, or toggle before/after — never for
+engagement. Static-first is the default; an interaction has to pay for itself in
+fidelity or clarity. Keep it CSP-safe: **vanilla JS only, inline, no libraries.**
+
+A stepper that walks a sequence one stage at a time — the highest-value pattern for
+a mechanism or a walk:
+
+```html
+<div class="stepper" data-step="0">
+  <div class="stage" data-stage="0">Stage 0 — the initial state.</div>
+  <div class="stage" data-stage="1" hidden>Stage 1 — after the first move.</div>
+  <div class="stage" data-stage="2" hidden>Stage 2 — the result.</div>
+  <div class="controls">
+    <button type="button" data-nav="prev">‹ back</button>
+    <span class="count"></span>
+    <button type="button" data-nav="next">next ›</button>
+  </div>
+</div>
+<script>
+for (const s of document.querySelectorAll(".stepper")) {
+  const stages = s.querySelectorAll(".stage");
+  const count = s.querySelector(".count");
+  const show = (i) => {
+    i = Math.max(0, Math.min(stages.length - 1, i));
+    s.dataset.step = i;
+    stages.forEach((el, j) => { el.hidden = j !== i; });
+    count.textContent = `${i + 1} / ${stages.length}`;
+  };
+  s.querySelector('[data-nav="prev"]').addEventListener("click", () => show(+s.dataset.step - 1));
+  s.querySelector('[data-nav="next"]').addEventListener("click", () => show(+s.dataset.step + 1));
+  show(0);
+}
+</script>
+```
+
+For before/after, reuse the `.compare` cards and flip which is shown. Make every
+control a real `<button>` so it is keyboard-reachable, and gate any motion behind
+`prefers-reduced-motion`.
 
 ---
 

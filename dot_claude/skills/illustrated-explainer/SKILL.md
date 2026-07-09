@@ -1,34 +1,53 @@
 ---
 name: illustrated-explainer
-description: "Produce a polished, self-contained visual explainer as an Artifact web page — for a concept, system, algorithm, or mechanism explained to someone unfamiliar. Grounds the visual identity in the subject's own states (colors encode real distinctions, not decoration), structures it as problem → idea → mechanism → worked-example → why-it-holds, draws the structural parts as inline diagrams, and pairs it with a distilled summary in the conversation. Use when the user asks to explain, illustrate, or walk through how something works; wants a full-resolution, from-scratch, easy-to-read, or explain-to-a-stranger explanation; says they could not follow or could not see something; or when a concept would land better as a visual page than as terminal text (teaching, onboarding, architecture and mechanism walkthroughs). Composes with the artifact-design skill for palette, type, and layout craft."
+description: "Produces a faithful, easy-to-follow explanation of an unfamiliar concept, system, algorithm, or mechanism for a smart stranger, in whichever medium best fits the content — a self-contained visual page when the subject is structural or has moving parts, a tighter inline answer when it's linear. Grounds the visuals in the subject's own states (color encodes meaning, not decoration), derives structure from the subject rather than a fixed template, shows the hard part at full resolution, and pairs it with a distilled summary in chat. Use when the user asks to explain, illustrate, teach, or walk through how something works; wants a full-resolution, from-scratch, easy-to-read, or explain-to-a-stranger explanation; says they couldn't follow or couldn't see something; or for teaching, onboarding, and architecture or mechanism walkthroughs. Composes with artifact-design for visual craft; discovers specialized craft skills as needed. Not for quick factual answers, one-liners, or code-only replies."
 ---
 
 # Illustrated explainer
 
-Turn a concept, system, algorithm, or mechanism into a polished visual explainer — an Artifact web page a newcomer can follow top to bottom — and pair it with a distilled summary in the conversation. This skill owns the **medium decision, the explanation arc, the subject-grounding, and the diagrams**; it composes with `artifact-design` for the visual-craft layer (palette, type, layout, anti-templating).
+Make an unfamiliar concept, system, algorithm, or mechanism understandable to a **smart stranger**, at **full fidelity**, in **whichever medium best serves the content** — then pair it with a distilled summary in the conversation. The skill owns the **medium choice, the fidelity contract, the pedagogy, the subject-grounding, and the diagrams**; it *composes* craft skills rather than re-implementing them (see Composition).
 
 ## When this fires
 
-Explaining how something works to someone unfamiliar; a "full-resolution", "from scratch", "easy-to-read", or "explain to a stranger" request; the user says they "couldn't follow" or "couldn't see" something; teaching material, onboarding, architecture or mechanism walkthroughs. When the ask is a quick factual answer, a one-liner, or code only, this is the wrong tool — answer inline instead.
+Explaining how something works to someone unfamiliar; a "full-resolution", "from scratch", "easy-to-read", or "explain to a stranger" request; the user says they "couldn't follow" or "couldn't see" something; teaching, onboarding, architecture or mechanism walkthroughs. This is a **teaching** tool, not a presentation one — for recaps, dashboards, or status tables that *present* rather than *explain*, it is the wrong fit. For a quick factual answer, a one-liner, or code only, answer inline instead.
 
 ## Procedure
 
-Work through these in order. Steps 3–5 are where the quality lives.
+Steps 3–5 are where the quality lives. Steps 3 and 5 (grounding the visuals, drawing the diagrams) apply when step 2 lands on a visual page; for an inline answer they collapse into the prose.
 
-1. **Confirm the medium.** Build a visual Artifact only when the content is conceptual, structural, or has moving parts a diagram clarifies. For a short factual reply, stay in the thread. Write the page to a `.html` file and publish with the Artifact tool.
-2. **Pin the subject.** Name one concrete subject, its audience (assume a smart stranger — no shared jargon), and the single thing they should walk away understanding. Everything below serves that one job.
-3. **Ground the visuals in the subject's own states.** Before any styling, list the subject's real distinctions — the ones the explanation turns on (e.g. proven vs unproven, granted vs refused, before vs after, healthy vs failing). Map each to a color so the palette *encodes meaning*. A legend then names them once. Only now load `artifact-design` for palette/type/layout craft. See `references/playbook.md` → "Palette from states".
-4. **Structure the explanation as an arc**, not a reference dump: thesis → the problem → the core idea → the mechanism *at full resolution* → a worked example → why it holds → what's next. Lead each section with a one-sentence claim; define every term the first time it appears. See `references/playbook.md` → "The arc".
-5. **Draw the structural parts.** Anything with structure — a graph, a pipeline, a before/after, a state machine, a data flow — gets an inline SVG/HTML diagram with a one-line caption and a semantic legend. Prose explains; diagrams show. See `references/playbook.md` → "Diagram cookbook".
-6. **Pair it with an inline summary.** After publishing, put a tight distilled version in the conversation — the thesis plus the mechanism in a few paragraphs — so the thread carries the gist and work can continue without opening the panel.
+1. **Pin the subject.** Name one concrete subject, its audience (assume a smart stranger — no shared jargon, unless the user names a different audience), and the single thing they should walk away understanding. Everything below serves that one job.
+
+2. **Choose the medium by fit, not habit.** Deliver in whichever form best serves *this* content, among those you render at genuinely high quality — do not default mechanically to one. Judge on a single axis: how much the content must be *seen* to be understood — its structure, states, moving parts — versus merely *read*. The more it must be seen, the more it earns a rich, self-contained visual page; the more it is linear or verbal, the lighter the medium. **Whenever the delivered medium is a published HTML page, it must be self-contained** (see Artifact constraints).
+
+3. **Ground the visuals in the subject's own states.** Before styling, list the subject's real distinctions — the ones the explanation turns on (proven vs unproven, granted vs refused, before vs after, healthy vs failing). Map each to a color so the palette *encodes meaning*; a legend names them once. Only then bring in craft (see Composition). See `references/playbook.md` → "Palette from states".
+
+4. **Build the explanation by method, not template.** Do not stamp a fixed section list. Derive the structure from the subject, governed by the invariants and ordering constraints below; the "arc" in the playbook is a *default to adapt*, never a schema.
+   - **Invariants:** define-on-first-use · claim-first paragraphs · motivate the problem before the mechanism · show-don't-assert (every load-bearing claim earns one example, diagram, or step; the *hardest* claim earns the most vivid one) · one narrative thread, not parallel sections · color and shape encode real state.
+   - **Ordering constraints** — a partial order, not a sequence: thesis near the top · define before use · problem before its fix · trust-argument after the mechanism.
+   - **Fidelity contract (non-negotiable):** the stranger gets the friendly, step-by-step treatment *and* the complete, honest mechanism. **Never trade a load-bearing detail for a smoother read; the hard or surprising part is the one thing you may not omit** — it is what they came for. You may *encapsulate* — name a sub-part, state its contract, defer its internals — but only when every claim at the current level stays true if the box were opened. Deferring detail behind an honest, named boundary is compression; dropping detail that changes what's true at the current level is unfaithful. See `references/playbook.md` → "The arc".
+
+5. **Show the structural parts.** Anything with structure — a graph, pipeline, before/after, state machine, data flow, or dataset — gets an inline diagram with a one-line caption and a semantic legend. Prose explains; diagrams show. **Interactivity is welcome when it earns its place** — letting the reader replay or drive the hard part, compare states, or step the mechanism — never as decoration; static-first is the default. See `references/playbook.md` → "Diagram cookbook", "Chart craft", "Earned interactivity".
+
+6. **Pair it with an inline summary.** After delivering a page, put a tight distilled version in the conversation — the thesis plus the mechanism in a few paragraphs — so the thread carries the gist and work can continue without opening the panel.
+
+## Composition — delegate craft, don't re-implement
+
+Own the pedagogy; borrow the craft. Three rules:
+
+- **Delegate to subordinate pure-craft skills** — ones that own only "how it looks" and hold no opinion on scope, medium, or pedagogy. **Resident hot set:** `artifact-design` for page craft (palette pairing, type, layout, anti-templating) — load it at step 3 once the semantic palette is set. The playbook's diagram and chart cookbook covers the common visual craft in-house.
+- **Discover the long tail just-in-time.** For a specialized craft surface a *particular* subject needs (maps, math typesetting, musical notation, molecular structure…), find and vet the right craft skill *at that moment* via the skills ecosystem (`find-skills` / `npx skills find`) rather than a fixed roster. Vet before trusting: a delegate must be reputable, pure-craft, subordinate, and self-contained-compatible (no mandated external CDN library).
+- **Borrow, don't delegate, from opinion-carrying peers.** A skill with its own scope, medium, or pedagogy stance (e.g. a general visual-output generator) is a peer, not a subordinate — lift its concrete techniques into the playbook under your own constraints; never hand it control.
 
 ## The bar (check the result against this)
 
 - A reader could re-explain the idea to someone else afterward.
 - Nothing is asserted without being shown or exemplified once — especially the hard part.
+- No load-bearing detail was dropped for convenience; every simplification is an honest, named encapsulation, not a distortion.
+- The medium fits the content — a page only where structure must be seen; inline where it needn't be.
 - The visual identity is legible with the labels removed: color and shape carry the meaning.
+- Interactivity, if any, does explanatory work; motion is restrained.
 - It reads as a story with one thread, not a spec with parallel sections.
 
-## Artifact constraints (non-negotiable)
+## Artifact constraints (non-negotiable when the medium is a published HTML page)
 
-Self-contained: inline all CSS/JS, embed images as data URIs, no external fonts or CDNs (the CSP blocks them — use system font stacks). Responsive: wide diagrams scroll inside their own `overflow-x: auto` box so the page body never scrolls sideways. Theme-aware unless the design commits to one look. Set a stable `<title>` and an emoji favicon. Write page content only — no `<html>`, `<head>`, or `<body>` wrapper (the tool adds them). Full checklist in `references/playbook.md`.
+Self-contained (inline CSS/JS, no external fonts or CDNs — the CSP blocks them), theme-aware, content-only (no `<html>`/`<head>`/`<body>` wrapper — the tool adds them), with a stable `<title>` and an emoji favicon. Full property-level checklist in `references/playbook.md`.
