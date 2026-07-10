@@ -66,7 +66,7 @@ description: "공유되거나 영속되어 다른 사람에게 읽힐 한국어 
    ❌/✅ 예시 1쌍 포함.
 3. 정본은 chezmoi 소스다. `chezmoi source-path ~/.agents/skills/ko-quality/references/principles.md`
    로 소스 파일을 찾아 수정하고, `chezmoi apply` 후 커밋한다.
-4. 파일이 ~12KB를 넘으면 우선순위 최하위 원칙의 정리를 사용자에게 제안한다.
+4. 파일이 ~14KB를 넘으면 우선순위 최하위 원칙의 정리를 사용자에게 제안한다.
 
 ## 업스트림 재증류
 
