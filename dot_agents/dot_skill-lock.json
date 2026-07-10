@@ -29,6 +29,51 @@
       "pluginName": "mattpocock-skills",
       "installedAt": "2026-07-09T04:58:30.710Z",
       "updatedAt": "2026-07-09T04:58:30.710Z"
+    },
+    "requesting-code-review": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/requesting-code-review/SKILL.md",
+      "skillFolderHash": "c9144401a26cbe2549a0020c65c478a6a0bdfaee",
+      "installedAt": "2026-07-10T05:17:19.646Z",
+      "updatedAt": "2026-07-10T05:17:19.646Z"
+    },
+    "receiving-code-review": {
+      "source": "obra/superpowers",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/obra/superpowers.git",
+      "skillPath": "skills/receiving-code-review/SKILL.md",
+      "skillFolderHash": "f54c765d64eedccc17aa099b4947e64231f4b698",
+      "installedAt": "2026-07-10T05:17:22.654Z",
+      "updatedAt": "2026-07-10T05:17:22.654Z"
+    },
+    "grammar-checker": {
+      "source": "daleseo/korean-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/daleseo/korean-skills.git",
+      "skillPath": "skills/grammar-checker/SKILL.md",
+      "skillFolderHash": "d0f49a1c950d46de1ef7dcfb94b8d1ca54552cf2",
+      "installedAt": "2026-07-10T06:06:32.382Z",
+      "updatedAt": "2026-07-10T06:06:32.382Z"
+    },
+    "humanizer": {
+      "source": "daleseo/korean-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/daleseo/korean-skills.git",
+      "skillPath": "skills/humanizer/SKILL.md",
+      "skillFolderHash": "48e4936c39235c2c5cdd16409d233e45da183e6d",
+      "installedAt": "2026-07-10T06:06:34.986Z",
+      "updatedAt": "2026-07-10T06:06:34.986Z"
+    },
+    "style-guide": {
+      "source": "daleseo/korean-skills",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/daleseo/korean-skills.git",
+      "skillPath": "skills/style-guide/SKILL.md",
+      "skillFolderHash": "97ca9986da14798c86dbb903996fe2c1113ed9ff",
+      "installedAt": "2026-07-10T06:06:37.403Z",
+      "updatedAt": "2026-07-10T06:06:37.403Z"
     }
   },
   "dismissed": {
