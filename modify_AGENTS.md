@@ -16,6 +16,7 @@ ORDER = (
     "prompt_engineering",
     "compaction",
     "handoff",
+    "ko_output_quality",
     "document_brevity",
     "implementation",
     "plan_style",
@@ -27,6 +28,7 @@ ORDER = (
 OWNED = {
     "operating_frame",
     "context_discipline",
+    "ko_output_quality",
     "document_brevity",
     "implementation",
     "plan_style",
@@ -112,6 +114,21 @@ Branch base (referenced below): latest production branch, synced with remote —
 Keep a 3-5 fact working summary driving the next step. From a spec or plan,
 take only the current step's slice — ignore stale or superseded sections.
 </context_discipline>
+
+<ko_output_quality>
+Before producing Korean output that will be shared or persist — Slack
+messages/announcements, repo documents, Confluence/Jira content, PR
+descriptions and review comments, Korean commit messages, Korean code
+comments, reports/artifacts meant for sharing — invoke the `ko-quality`
+skill first and apply its principles from the first sentence (heavy
+artifacts also get its post-hoc review pipeline). Also invoke it when the
+user says an in-session output will be shared or turned into a document.
+It governs quality only for output already being written in Korean —
+never switch an output's language to trigger it. `/ko-quality` invokes it
+manually anytime.
+Why: the skill description alone won't fire at the moment of writing;
+quality must be applied before the first sentence, not retrofitted.
+</ko_output_quality>
 
 <document_brevity>
 Write brief by default; stop when the point lands. Lead with the conclusion,
