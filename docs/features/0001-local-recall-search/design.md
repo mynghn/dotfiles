@@ -123,6 +123,9 @@ Rationale: [design-rationale.md](design-rationale.md#d-6-index-lifecycle-refresh
 
 - qmd collections (name → root): `kb-vault` → `~/.local/share/metacognition-vault`; `agent-skills` → `~/.agents/skills`; `chezmoi-docs` → `~/.local/share/chezmoi/docs`.
   `~/.claude/skills` is deliberately excluded in v1 — it is mostly symlinks into `agent-skills` and would double-index; revisit when dedup behavior is verified.
+- Corpus provenance differs per collection, so a fresh machine does not get all three alike (`Understanding#Delta-6-the-layer-is-portable-the-corpora-are-not`): `chezmoi-docs`'s root is this repo's own source clone and is always present; `agent-skills` is partial, since these dotfiles manage only some of the skills that accumulate there; `kb-vault`'s root is a repository these dotfiles do not manage, so it is absent until separately cloned.
+  Registration is therefore conditional by design — D-5 skips an absent corpus with a log rather than failing provisioning, and a query against an unregistered collection takes `Spec#B-5-unindexed-corpus-surfaced`'s explicit not-found path.
+  Naming a root here declares a dependency, not a guarantee that the corpus is on the machine; whether the dotfiles should own the absent one is `Deferrals#Defer-2-corpus-provenance-ownership`.
 - Fallback branch: if incremental update proves slow on a corpus, the skill prefixes results with an explicit staleness indication instead (the `Spec#C-2-staleness-surfaced` or-branch) — never a silent stale result.
 
 ## D-7: ck-index-git-ignore

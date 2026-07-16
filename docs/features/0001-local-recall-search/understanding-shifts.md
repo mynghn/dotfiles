@@ -123,3 +123,30 @@ Both replace an inherited PATH assumption with an owned one — the engine's rea
 
 Correction: Design names the explicit install root and drops the claim about the default root's PATH membership.
 This corrects `Design#D-2-code-recall-engine-ck` and stops there — the provisioning realization and the observable contract are both already right.
+
+## Delta-6: the-layer-is-portable-the-corpora-are-not
+
+Design names three collection roots as though provisioning puts all three corpora on every machine.
+Fresh-machine verification (V2, provisioning a clean `HOME` from these dotfiles alone) shows the recall **layer** is fully portable while the **corpora** are portable to three different degrees.
+
+Evidence from that clean machine:
+
+- The layer arrives complete and works: engines, pinned runtime wrapper, models, and the routing skill all land, and the very first query succeeds with no network at all (`Spec#B-4-first-query-readiness`, verified there rather than argued).
+- `chezmoi-docs` is present on any real machine — its root is the dotfiles' own source clone, which the standard setup places at exactly that path.
+- `agent-skills` arrives **partial**: the dotfiles manage 8 of this machine's 44 skills; the rest are installed by other tools' own installers, so a fresh machine's corpus is a subset until those run.
+- `kb-vault` is **absent**: its root is a separate repository these dotfiles do not manage, so provisioning logged `corpus absent` and skipped it.
+
+The realization already handles this honestly rather than silently: an absent corpus is skipped with a log at provisioning time, and a later query against it exits 1 with an explicit not-found — the surfaced-gap branch `Spec#B-5-unindexed-corpus-surfaced` exists for.
+Nothing reports an unregistered corpus as an empty one, which is the failure that would actually hurt.
+
+`Spec#C-3-uniform-across-machines` still holds and is worth stating precisely, because the raw observation looks like a violation: the same query returns different entries on the two machines.
+C-3 constrains the *capability's behavior* — engines, commands, flags, and the offline property are identical on both.
+What differs is *content*.
+This is the distinction between a grep that finds different lines because the files differ and a grep that behaves differently; only the second would breach the contract.
+
+The durable finding is that **a search layer's portability and its corpora's portability are separate properties, and only the first is these dotfiles' to guarantee**.
+Naming a corpus root in Design does not put that corpus on a machine — it names a dependency whose own provenance must be stated rather than assumed.
+This is the third instance of one pattern (`Understanding#Delta-3-ignore-target-is-machine-variant-source-is-not`, `Understanding#Delta-5-an-install-root-is-only-useful-where-the-shell-already-looks`): the dotfiles source is machine-invariant, and every unstated assumption about what a machine already has is where that invariance leaks.
+
+Correction: Design states each collection's corpus provenance and what a fresh machine actually gets.
+Whether the dotfiles should additionally *own* the absent corpus — cloning the vault so `kb-vault` becomes portable — is a scope decision rather than a repair, and is recorded as an open deferral instead of settled here (`Deferrals#Defer-2-corpus-provenance-ownership`).
