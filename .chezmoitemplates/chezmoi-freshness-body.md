@@ -1,9 +1,3 @@
----
-name: chezmoi-freshness
-description: Check and (after confirmation) update the freshness and validity of the chezmoi-managed dotfiles — the source repo, apply-drift, and any configured chezmoi git-repo externals. Use when asked to check, verify, doctor, or update chezmoi state, or after a main-branch update to a configured external. Goes beyond `chezmoi status`, which reports an external as clean until its refresh period elapses and so can hide upstream commits — this fetches and compares each external against its real remote. For the Metacognition framework (NOT chezmoi-managed) use metacognition-freshness instead.
-argument-hint: "[check | update]"
----
-
 The **chezmoi surface** of this machine's agent toolchain: the dotfiles source repo, apply-drift, and any configured chezmoi git-repo externals. Mechanism is declarative — `chezmoi update`. (The Metacognition framework is a *separate* surface — `git pull` + `install`, not chezmoi — owned by `metacognition-freshness`.)
 
 **Read-first, confirmed-update.** Run the check, show the verdict, then update only what it flags `**`, and only after the user confirms.
