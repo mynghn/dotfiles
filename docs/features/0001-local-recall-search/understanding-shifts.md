@@ -79,3 +79,27 @@ Reading the live configuration at implement time reads *this* machine's answer a
 Correction: manage both candidate paths with the same rule, so the ignore is effective under either configuration rather than correct on one machine and silently absent on the next.
 The cost is one duplicated line; the alternative is a guarantee that holds only where it was authored.
 This corrects Design's ignore decision and stops there.
+
+## Delta-4: result-volume-is-half-the-output-contract
+
+Design's output contract (`Design#D-3-routing-skill-local-search`) treats a result's **location** as the only thing the engines' defaults get wrong, and corrects it per-engine with a location flag.
+Implementation (V1, exercising the taught commands against a code tree with no prior index) found a second default that defeats the same intent — on the code lane only.
+
+This is a **gap, not a contradiction**: `Spec#C-4-actionable-result-locations` is literally met by the taught command — every one of its results does carry `file:line`.
+The defect is that the command buries the answer among the rest, so recording it honestly means correcting Design's realization, not the contract.
+
+Evidence gathered against the installed engines:
+
+- The code engine's hybrid mode defaults to **unlimited results and no threshold** (it announces `top unlimited results, threshold ≥none`), unlike its semantic mode, which defaults to top 10 at ≥0.6.
+  On a 13-file tree the taught command returns 127 result lines / 97,159 bytes; the same query capped at ten returns 5,870 — a 16.5× difference that scales with the tree, so a real repository is far worse.
+- The engine's own help designates capped output the agent-facing form, pairing a result cap and a threshold under the heading of high-confidence agent results.
+- The engine ignores `NO_COLOR`: ANSI escapes are emitted even into a pipe, padding every result of that flood with markup no reader needs.
+
+The prose engine has the opposite default — it caps at five — which is why the gap survived Design review: the two lanes were assumed symmetric on everything but the flag each needed.
+
+The durable finding is that **an actionable location is not only openable but findable**.
+A location flag makes each hit openable; a result cap makes the right hit findable — and a contract phrased only over the individual result silently passes a command that returns the corpus.
+This is Delta-2's asymmetry lesson applied to a second axis: the engines' defaults diverge over volume exactly as they diverged over location, so the contract must be stated per-engine over both rather than generalized from either.
+
+Correction: the routed code command carries a result cap alongside its line flag, and the output contract is stated over volume as well as location.
+This corrects Design (`Design#D-3-routing-skill-local-search`'s output contract and `Design#D-2-code-recall-engine-ck`'s taught command) and stops there — Spec and Requirements are unchanged, since the contract was right and the realization under-served it.

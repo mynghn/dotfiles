@@ -48,9 +48,12 @@ Rationale: [design-rationale.md](design-rationale.md#d-1-prose-recall-engine-qmd
 Code recall (`Spec#B-2-code-recall-lookup`) is realized by ck (`BeaconBay/ck`) pinned at `ck-search@0.7.11` via cargo, landing a static binary at `~/.cargo/bin/ck`.
 Rationale: [design-rationale.md](design-rationale.md#d-2-code-recall-engine-ck).
 
-- Query command the skill teaches: `ck -n --hybrid "<behavior/concept phrase>" <path>` (BM25 + embedding); `--sem` for pure semantic when hybrid over-weights keywords.
+- Query command the skill teaches: `ck -n --hybrid --topk 10 "<behavior/concept phrase>" <path>` (BM25 + embedding); `--sem` for pure semantic when hybrid over-weights keywords.
   Both modes are verified present on the pinned version, and both auto-index on query.
 - Result shape: `-n` is load-bearing, not cosmetic — without it the engine prints the file and the matching chunk but no line number, so only `-n` yields the span `Spec#C-4-actionable-result-locations` requires (`Understanding#Delta-2-engine-surfaces-verified-against-installed-versions`).
+- Result volume: `--topk 10` is equally load-bearing — this mode alone defaults to *unlimited* results at no threshold (`--sem` defaults to top 10 at ≥0.6), so uncapped it returns the ranked corpus rather than the answer: 127 results / 97,159 bytes against a 13-file tree, versus 5,870 capped, and the gap widens with the tree (`Understanding#Delta-4-result-volume-is-half-the-output-contract`).
+  The cap matches this engine's own semantic default rather than inventing a number.
+  The engine also ignores `NO_COLOR` and emits ANSI escapes into a pipe; that is cosmetic at ten results and is left alone, `--jsonl --no-snippet` being the escape hatch if a caller ever needs clean machine-readable output.
 - Model cache: `~/.cache/ck`; the per-tree index is `.ck/` at the searched root (the directory D-7 keeps out of version control).
 - No interpreter to pin: a self-contained Rust binary, so D-8's wrapper is not needed here — only `~/.cargo/bin` on PATH.
 - Embeddings run in-process (ONNX, cached once); index lives in `.ck/` at the searched tree's root, built on first query and updated incrementally on later ones.
@@ -66,10 +69,13 @@ Rationale: [design-rationale.md](design-rationale.md#d-3-routing-skill-local-sea
   For a known token or regex, use rg directly; this skill owns the meaning-only case."
 - Routing table the body teaches (positive instructions, each with its one-line why):
   - known token / regex → `rg` — exact, index-free, always fresh.
-  - meaning over a code tree → `ck -n --hybrid "…" <path>` — embeddings find code whose names you don't know.
+  - meaning over a code tree → `ck -n --hybrid --topk 10 "…" <path>` — embeddings find code whose names you don't know.
   - meaning over prose corpora → `qmd query "…" -c <collection> --full-path` — expansion + rerank absorb vocabulary drift.
 - 4 few-shot examples in identical Do/Don't format covering the routing edges: known-symbol→rg, code-concept→ck, prose-concept→qmd, too-vague→sharpen the query first.
-- Output contract: every routed command carries its location flags — `rg` natively, `ck` via `-n` (D-2), qmd via `--line-numbers --full-path` (D-1) — because each engine's *default* output omits the line span `Spec#C-4-actionable-result-locations` requires.
+- Output contract: a routed result must be both **openable** and **findable**, and each engine's defaults miss a different half — so every routed command carries exactly the flags its own engine requires, generalized from neither.
+  - Openable — the location: `rg` natively, `ck` via `-n` (D-2), qmd via `--full-path` (D-1), which is the only flag qmd needs here; it emits the line number by default (`Understanding#Delta-2-engine-surfaces-verified-against-installed-versions`).
+  - Findable — the volume: `ck` via `--topk 10` (D-2), whose hybrid mode alone defaults to unlimited; qmd caps at five by default and rg is the agent's own literal query, so neither needs a cap (`Understanding#Delta-4-result-volume-is-half-the-output-contract`).
+  A contract phrased only over the individual result passes a command that returns the whole corpus with every line correctly numbered, which is why volume is stated here rather than left to the engine.
   Fallback only: if a qmd hit still lacks a usable anchor, resolve it with `rg -nF "<distinctive snippet fragment>" <file>`.
 - Unindexed-corpus phrasing (`Spec#B-5-unindexed-corpus-surfaced`): the skill instructs the agent to relay the explicit state and remedy.
   For qmd, name the missing collection and the register+index command; for ck, state that the first query builds `.ck/` and will be slow, not broken.
