@@ -14,13 +14,16 @@ Run the bundled sweep (`scripts/check.sh` in this skill's own directory):
 ~/.claude/skills/chezmoi-freshness/scripts/check.sh   # Claude
 ~/.agents/skills/chezmoi-freshness/scripts/check.sh   # Codex
 ```
-Reports validity (`chezmoi doctor`), apply-drift (`chezmoi status`), the dotfiles source vs origin, and **each configured external's behind/ahead vs its real remote** (fetch-only). `behind=0` everywhere ⇒ fresh; `**` marks a surface with unpulled upstream commits.
+Reports validity (`chezmoi doctor`), apply-drift (`chezmoi status`), the dotfiles source vs origin, and **each configured external's behind/ahead vs its real remote** (fetch-only). `behind=0` everywhere ⇒ fresh; `**` marks actionable apply drift or unpulled upstream commits.
+
+Second-column `R` entries from unconditional `run_` scripts are reported as informational `[run]` entries, not apply drift: chezmoi schedules them on every apply, so they remain in `chezmoi status` after a successful update.
 
 > Why not just `chezmoi status`: it treats an external as clean until its `refreshPeriod` elapses, silently hiding upstream commits. The script fetches and compares configured externals directly.
 
 ## 2. Update (only flagged surfaces, only after confirmation)
 - **A configured external stale, or the source behind with externals configured** → `chezmoi update --refresh-externals` (pulls the source and re-pulls externals regardless of refresh period).
 - **Source behind only, no externals stale** → `chezmoi update`.
+- **Informational `[run]` entries only** → no update needed; they are unconditional scripts scheduled for every apply.
 - **Cosmetic apply-drift** — a lone trailing-newline on `.claude/settings.json` (Claude Code rewrites it) → ignore, or `chezmoi re-add ~/.claude/settings.json`, or `.chezmoiignore` it.
 
 Re-run the check to confirm `behind=0` afterward.
@@ -34,5 +37,6 @@ Re-run the check to confirm `behind=0` afterward.
   unset MYNGHN_TOKEN
   ```
 - **`chezmoi status` ≠ fresh** — it hides externals stale within their refresh period; trust the script's behind/ahead vs remote.
+- **`R` ≠ drift.** A second-column `R` means an unconditional script will run on apply; it is expected to persist and must not trigger an update.
 - **Never history-op the chezmoi source repo** (no amend/rebase) — it takes the user's own commits concurrently; let them commit, don't.
 - Sibling skill: **metacognition-freshness** owns the Metacognition framework surface (it's install-bootstrapped, not chezmoi).

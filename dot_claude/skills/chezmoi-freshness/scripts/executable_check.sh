@@ -30,9 +30,12 @@ echo "== chezmoi-freshness ===================================================="
 errs="$(chezmoi doctor 2>/dev/null | grep -cE '^error' || true)"
 echo "[validity] chezmoi doctor errors: ${errs:-0}  (a 'latest-version' warning is cosmetic)"
 st="$(chezmoi status 2>/dev/null || true)"
-if [ -z "$st" ]; then echo "[apply  ] clean — target matches source"
-else echo "[apply  ] ** pending drift (chezmoi apply would change):"; echo "$st" | sed 's/^/           /'
+run_st="$(printf '%s\n' "$st" | awk 'substr($0, 2, 1) == "R"')"
+drift_st="$(printf '%s\n' "$st" | awk 'substr($0, 2, 1) != "R"')"
+if [ -z "$drift_st" ]; then echo "[apply  ] clean — target matches source"
+else echo "[apply  ] ** pending drift (chezmoi apply would change):"; echo "$drift_st" | sed 's/^/           /'
   echo "           (a lone 'MM .claude/settings.json' is a trailing-newline rewrite — cosmetic)"; fi
+if [ -n "$run_st" ]; then echo "[run    ] expected on apply (unconditional scripts):"; echo "$run_st" | sed 's/^/           /'; fi
 
 SRC="$(chezmoi source-path)"; s="$(sync_state "$SRC")"; echo "[source ]$(flag "$s") $s  ($SRC)"
 
