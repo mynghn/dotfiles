@@ -38,9 +38,8 @@ The skill reaches qmd through the D-8 wrapper, never a bare `qmd` on PATH — th
 Prose recall (`Spec#B-1-prose-recall-lookup`) is realized by qmd (`tobi/qmd`) pinned at `@tobilu/qmd@2.5.3`, installed by the pinned node's npm (D-5) and always invoked through the D-8 wrapper.
 Rationale: [design-rationale.md](design-rationale.md#d-1-prose-recall-engine-qmd).
 
-- Query command the skill teaches: `qmd query "<natural-language question>" -c <collection> --line-numbers --full-path` (hybrid keyword + vector + rerank — highest quality); `qmd search` (keyword) and `qmd vsearch` (vector-only) exist but are not routed to in v1.
-  `-c/--collection`, `--line-numbers`, and `--full-path` are verified present on the pinned version.
-- Result shape: the two location flags are load-bearing, not cosmetic — the default output is a `qmd://` docid rather than an on-disk path, and only these flags yield the file + line span `Spec#C-4-actionable-result-locations` requires (`Understanding#Delta-2-engine-surfaces-verified-against-installed-versions`).
+- Query command the skill teaches: `qmd query "<natural-language question>" -c <collection> --full-path` (hybrid keyword + vector + rerank — highest quality); `qmd search` (keyword) and `qmd vsearch` (vector-only) exist but are not routed to in v1.
+- Result shape: `--full-path` is load-bearing and is the *only* flag that is — verified on a populated index, the engine emits the line number by default but renders the location as a `qmd://` docid, which no agent can open; the flag turns it into the on-disk `path:line` that `Spec#C-4-actionable-result-locations` requires (`Understanding#Delta-2-engine-surfaces-verified-against-installed-versions`).
 - Models (all local GGUF, cached under `~/.cache/qmd/models/`): embeddinggemma-300M, qwen3-reranker-0.6b, query-expansion-1.7B — the engine exposes no pull command, so D-5 forces them by warm-up invocation and `Spec#B-4-first-query-readiness` holds.
 - Index: `~/.cache/qmd/index.sqlite`; `--no-rerank` is the documented escape hatch if reranking proves slow on CPU.
 
@@ -68,7 +67,7 @@ Rationale: [design-rationale.md](design-rationale.md#d-3-routing-skill-local-sea
 - Routing table the body teaches (positive instructions, each with its one-line why):
   - known token / regex → `rg` — exact, index-free, always fresh.
   - meaning over a code tree → `ck -n --hybrid "…" <path>` — embeddings find code whose names you don't know.
-  - meaning over prose corpora → `qmd query "…" -c <collection> --line-numbers --full-path` — expansion + rerank absorb vocabulary drift.
+  - meaning over prose corpora → `qmd query "…" -c <collection> --full-path` — expansion + rerank absorb vocabulary drift.
 - 4 few-shot examples in identical Do/Don't format covering the routing edges: known-symbol→rg, code-concept→ck, prose-concept→qmd, too-vague→sharpen the query first.
 - Output contract: every routed command carries its location flags — `rg` natively, `ck` via `-n` (D-2), qmd via `--line-numbers --full-path` (D-1) — because each engine's *default* output omits the line span `Spec#C-4-actionable-result-locations` requires.
   Fallback only: if a qmd hit still lacks a usable anchor, resolve it with `rg -nF "<distinctive snippet fragment>" <file>`.

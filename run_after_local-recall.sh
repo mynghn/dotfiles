@@ -24,6 +24,16 @@ QMD_MODEL_CACHE="$HOME/.cache/qmd/models"
 CK_MODEL_CACHE="$HOME/.cache/ck"
 WARMUP_INDEX="local-recall-warmup"
 
+# The prose corpora worth recalling by meaning: distilled knowledge, agent
+# instructions, and managed planning docs. ~/.claude/skills is deliberately
+# absent — it is mostly symlinks into the agent skills tree and would index the
+# same files twice.
+QMD_COLLECTIONS=(
+  "kb-vault:$HOME/.local/share/metacognition-vault"
+  "agent-skills:$HOME/.agents/skills"
+  "chezmoi-docs:$HOME/.local/share/chezmoi/docs"
+)
+
 log() { printf 'local-recall: %s\n' "$1" >&2; }
 
 # Homebrew is the one prerequisite treated as the platform floor. Skipping
@@ -146,6 +156,33 @@ warm_qmd() {
   rm -f "$HOME/.cache/qmd/$WARMUP_INDEX.sqlite"
 }
 
+# Registration is the one-time build; keeping results fresh afterwards is the
+# search skill's job, which re-indexes incrementally before each query.
+ensure_collections() {
+  local entry name path added=0
+  for entry in "${QMD_COLLECTIONS[@]}"; do
+    name="${entry%%:*}"
+    path="${entry#*:}"
+    if [ ! -d "$path" ]; then
+      log "corpus absent, not registering '$name': $path"
+      continue
+    fi
+    if "$QMD_WRAPPER" collection list 2>/dev/null | grep -qF "$name"; then
+      continue
+    fi
+    log "registering collection '$name' -> $path"
+    "$QMD_WRAPPER" collection add "$path" --name "$name" >/dev/null
+    added=1
+  done
+
+  # Registering indexes text but leaves vectors unbuilt, so a collection added
+  # here cannot answer a meaning query until this runs.
+  if [ "$added" -eq 1 ]; then
+    log "building embeddings for newly registered collections"
+    "$QMD_WRAPPER" embed >/dev/null
+  fi
+}
+
 require_brew
 ensure_formula "$NODE_FORMULA"
 ensure_formula rust
@@ -156,3 +193,4 @@ remove_competing_qmd
 ensure_ck
 warm_ck
 warm_qmd
+ensure_collections

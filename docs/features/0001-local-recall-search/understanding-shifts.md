@@ -53,9 +53,10 @@ Falsified, correcting Design:
 
 - **Both engines omit line locations by default, and both can emit them on request.** Design routed a prose result through a second exact-match invocation to recover a line anchor, and separately assumed the code engine emitted line spans natively.
   Verified against the installed versions, neither held: the prose engine defaults to a scheme-qualified document id rather than a usable path, and the code engine prints the file and matching chunk with no line number at all — so *as designed, both lanes would have missed* `Spec#C-4-actionable-result-locations`.
-  Each engine does expose the needed output directly — line-number and on-disk-path options on the prose engine, a line-number flag on the code engine — so the second invocation is machinery the contract does not need.
-  The correction is symmetric: every routed command carries its engine's location flags, the extra hop survives only as a stated fallback, and the flags are treated as load-bearing rather than cosmetic.
-  The flags are verified present; their exact rendering on a populated index is confirmed downstream, where an indexed corpus first exists.
+  Each engine does expose the needed output directly, but asymmetrically — the prose engine emits the line number by default and needs only an on-disk-path flag, while the code engine needs a line-number flag — so the second invocation is machinery the contract does not need.
+  The correction is that every routed command carries exactly the flag its engine actually requires, and the extra hop survives only as a stated fallback.
+  Confirmed on a populated index rather than from flag existence: with the path flag the prose engine emits an absolute `path:line`, and without it a `qmd://` docid that no agent can open.
+  The asymmetry is the reason to verify per engine rather than generalize one engine's surface onto the other.
 - **The prose engine has no model-pull command**, resolving the question Design explicitly left open ("a warm-up invocation or the engine's pull command, whichever the installed version offers").
   Neither engine offers one: both fetch models on first real use, so provisioning must force a warm-up invocation per engine.
 
