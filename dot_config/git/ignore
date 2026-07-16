@@ -1,0 +1,8 @@
+**/.claude/settings.local.json
+
+# Per-tree semantic search indexes, rebuilt on demand by the search engine.
+# Duplicated in ~/.gitignore_global: git reads this path only when
+# core.excludesFile is unset, and that setting is not managed here — so a
+# machine set up from these dotfiles alone reads this file while one with the
+# override reads the other.
+.ck/

@@ -62,3 +62,20 @@ Falsified, correcting Design:
 
 The durable finding is that the engines' *published surfaces* are authoritative over anything inferred from documentation, and that a "reasonable" auxiliary mechanism can be pure cost once the real surface is read.
 Both corrections stop at Design; the observable contract is unchanged.
+
+## Delta-3: ignore-target-is-machine-variant-source-is-not
+
+Design deferred the global-ignore target to implementation, to be chosen by reading the live git configuration: the standard path by default, or the configured override when one exists.
+That instruction cannot be carried out as stated, and the reason generalizes.
+
+The dotfiles source is machine-**invariant** — one committed tree applied to every machine — while the ignore target is machine-**variant**:
+
+- This machine sets an explicit override, so the standard path is present but **inert**; git never reads it.
+- The override is declared in a file the dotfiles do not manage, so a machine provisioned from these dotfiles alone has no override and git reads the standard path instead.
+
+An implement-time choice between the two therefore cannot hold: whichever single file is committed is inert on exactly the machines that consult the other, and inert in the silent way — the ignore appears configured while the index directory stays untracked-and-visible, surfacing only as an accidental commit.
+Reading the live configuration at implement time reads *this* machine's answer and freezes it for all of them, which is the same class of error as pinning behavior to an ambient environment (`Understanding#Delta-1-qmd-runtime-is-path-dependent-not-bun`).
+
+Correction: manage both candidate paths with the same rule, so the ignore is effective under either configuration rather than correct on one machine and silently absent on the next.
+The cost is one duplicated line; the alternative is a guarantee that holds only where it was authored.
+This corrects Design's ignore decision and stops there.

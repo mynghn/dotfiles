@@ -119,5 +119,9 @@ Rationale: [design-rationale.md](design-rationale.md#d-6-index-lifecycle-refresh
 
 ## D-7: ck-index-git-ignore
 
-`.ck/` index directories are kept out of every repo's version control via the chezmoi-managed global git ignore: `dot_config/git/ignore` gains a `.ck/` line (git's default excludes path when `core.excludesFile` is unset).
-Why: per-tree indexes must never leak into commits, and one managed global line beats per-repo `.gitignore` edits; if the live gitconfig overrides `core.excludesFile`, implement lands the line in that file instead.
+`.ck/` index directories are kept out of every repo's version control by a `.ck/` line in **both** chezmoi-managed global ignore files — `dot_config/git/ignore` (git's path when `core.excludesFile` is unset) and `dot_gitignore_global` (the path this machine's gitconfig points at).
+Why: per-tree indexes must never leak into commits, and one managed global line beats per-repo `.gitignore` edits.
+
+- Both are managed because the source is machine-invariant while the target is not: the override lives in an unmanaged gitconfig, so a machine set up from these dotfiles alone reads the standard path while this one reads the override (`Understanding#Delta-3-ignore-target-is-machine-variant-source-is-not`).
+  Picking one at implement time freezes this machine's answer for every machine, and the loser is inert silently.
+- The duplicated line is the accepted cost; the failure it prevents is an ignore that appears configured and does nothing.
