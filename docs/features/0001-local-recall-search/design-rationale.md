@@ -34,8 +34,32 @@ Invalidation trigger: recall queries become frequent and measured per-query late
 
 The repo's convention (assume runtimes, skip gracefully — `run_after_npx-skills.sh`) was weighed against the portability guarantee and lost, by explicit planner decision: a silent skip on a fresh machine violates `Spec#C-3-uniform-across-machines` and `Spec#B-4-first-query-readiness`, exactly the guarantee this feature exists to give.
 Chosen: install-missing-via-brew with a loud named-remedy failure only when brew itself is absent — the one prerequisite the setup treats as the platform floor.
-Version pinning is part of the same decision: unpinned `bun install -g` / `cargo install` would drift machines apart over time, eroding C-3 silently; pins live in the script and are bumped deliberately.
+Version pinning is part of the same decision: unpinned installs would drift machines apart over time, eroding C-3 silently; pins live in the script and are bumped deliberately.
+Implementation falsified this block's original toolchain and install lines, which named bun as qmd's runtime and installer (`Understanding#Delta-1-qmd-runtime-is-path-dependent-not-bun`): bun is only qmd's launcher fallback when no node exists, and installing with it leaves an engine whose help text prints while every query exits 1 — the worst failure shape available, since it looks installed.
+The replacement pins node@22 and installs with that node's own npm, which additionally fixes the native-dependency ABI lock (installing and invoking node must match) and is why the pinned interpreter is not merely a version-floor concern.
 Model pre-pull at provision time is what moves the network moment out of the query lane entirely (`Spec#C-1-zero-network-at-query-time`, `Spec#B-4-first-query-readiness`) — the predecessor's fatal flaw was precisely a query-lane network dependency.
+
+## D-8: qmd-vendored-runtime-boundary
+
+The decision is *where* qmd's declared node floor gets satisfied, not whether to add a node dependency — the engine itself declares one, and on this machine it is currently unmet, which is why a default install is broken on arrival.
+Satisfying it from the machine's own node makes it a **system** dependency: it must happen to be new enough, and be the same node that built the ABI-locked native dependency, on every machine forever.
+That is the pre-existing-local-environment dependence the Requirements' portability guarantee forbids, and the machine-to-machine variance `Spec#C-3-uniform-across-machines` forbids.
+Satisfying it from a private, pinned runtime makes it a **private** dependency of one tool — the venv / bundled-runtime pattern — and leaves the machine's node and version manager untouched.
+
+Forces: qmd's launcher re-execs `node` resolved from PATH (bun only when no node exists at all), so the runtime is a property of the invoking shell rather than of the install; and the native dependency is ABI-locked to the installing node, so drift fails at load rather than degrading (`Understanding#Delta-1-qmd-runtime-is-path-dependent-not-bun`).
+Installing the pinned interpreter does not by itself fix this — verified here, where the pinned node is installed *and* linked onto PATH yet the ambient `node` still resolves to the version manager's older one, because that manager sits earlier in PATH.
+PATH position is the variable, which is why every alternative below that works by *placing* something on PATH is unsound.
+
+Alternatives weighed:
+invoking via an absolute pinned-node path — *falsified by experiment*: the launcher re-resolves `node` from PATH and re-execs, discarding it (same invocation exits 1 without the pinned node on PATH, 0 with it);
+a same-named wrapper alongside a default global install — *rejected on evidence*: the default install already places the engine's bin on PATH, so the wrapper would win only by PATH order, which is machine-varying — using an ambient-PATH race to fix an ambient-PATH bug, and losing it silently yields the broken build;
+prepending the pinned node to the user's global PATH — rejected as invasive: it changes the node every other tool sees, and still loses to a version manager that prepends later;
+requiring the user to make node ≥22 ambient — rejected as the forbidden systemic dependency above.
+
+Chosen: vendor the engine into a private off-PATH prefix and expose one pinned wrapper, verified to exit 0 from a shell whose ambient node is too old and whose PATH already resolves a competing broken copy.
+The private prefix is what makes the wrapper unambiguous — with no competitor on PATH it shadows nothing, so the naming concern dissolves rather than being accepted as a cost.
+Costs accepted: a second copy of the engine's dependency tree, and a pinned node the provisioning script must bump deliberately.
+Invalidation: a launcher honoring an explicit interpreter, or a release without the native dependency, collapses the wrapper to a plain path entry; the vendoring boundary stands regardless.
 
 ## D-6: index-lifecycle-refresh-on-invoke
 

@@ -28,14 +28,17 @@ flowchart LR
 
 ## T: P1
 
-- **Goal**: Provision the full query lane at `chezmoi apply` — toolchain via brew, pinned engines, models pre-pulled — per `Design#D-5-provisioning-run-after-brew`, so `Spec#B-4-first-query-readiness` becomes achievable and re-running every apply is the ongoing uniformity mechanism for `Spec#C-3-uniform-across-machines`.
+- **Goal**: Provision the full query lane at `chezmoi apply` — toolchain via brew, pinned engines vendored per `Design#D-8-qmd-vendored-runtime-boundary`, models pre-pulled — per `Design#D-5-provisioning-run-after-brew`, so `Spec#B-4-first-query-readiness` becomes achievable and re-running every apply is the ongoing uniformity mechanism for `Spec#C-3-uniform-across-machines`.
 - **Repo**: chezmoi source (`run_after_local-recall.sh`)
 - **Completion**:
   - (a) `chezmoi apply` runs the script cleanly; an immediate second apply is a full no-op (idempotence).
   - (b) `qmd` and `ck` resolve at the pinned versions; `rg` present — the pin + re-run-every-apply pair is the standing `Spec#C-3-uniform-across-machines` mechanism.
   - (c) both engines' model caches are populated by the script itself (no first-query download remains).
   - (d) with brew removed from `PATH` in a test shell, the script fails loudly naming the remedy — no silent skip.
+  - (e) runtime pinning holds where it previously failed (`Design#D-8-qmd-vendored-runtime-boundary`, `Spec#C-3-uniform-across-machines`): a qmd index operation exits 0 from a shell whose ambient `node` is the machine's own version-managed one, and exits 0 again with that node removed from `PATH` entirely — verified by exit code, never by output text.
+  - (f) the vendoring boundary holds (`Design#D-8-qmd-vendored-runtime-boundary`): exactly one qmd resolves on PATH and it is the wrapper — no competing copy from any other package manager survives, and the engine's own bin resolves nowhere on PATH.
 - **Dependencies**: none
+- **Guidelines**: The engines' installed `--help` is authoritative over the Design's command text; a divergence found here is `Understanding#Delta-2-engine-surfaces-verified-against-installed-versions` repeating, so raise it rather than adapting the script around it.
 
 ## T: P2
 
@@ -62,7 +65,7 @@ flowchart LR
 - **Repo**: chezmoi source (`dot_agents/skills/local-search/`, `dot_claude/skills/symlink_local-search`)
 - **Completion**:
   - (a) after apply, `~/.agents/skills/local-search/SKILL.md` exists and `~/.claude/skills/local-search` resolves to it; both agents list the skill.
-  - (b) content check against D-3: load-when description, positive routing table with reasons, 4 identically-formatted Do/Don't examples, snippet→line hop instruction, unindexed phrasing, zero network-escalation text.
+  - (b) content check against D-3: load-when description, positive routing table with reasons, 4 identically-formatted Do/Don't examples, the qmd location flags carried on every routed qmd command (`Spec#C-4-actionable-result-locations`), unindexed phrasing, zero network-escalation text.
   - (c) routing behavior: a known-token prompt leads the agent to `rg`; a meaning-only prompt leads it to the matching engine (`Spec#B-3-query-type-routing`, one-shot per branch).
 - **Dependencies**: P1 lands the engines that make (c) executable end-to-end; (a)–(b) need nothing.
 
