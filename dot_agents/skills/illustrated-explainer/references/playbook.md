@@ -36,10 +36,11 @@ Method:
 </div>
 ```
 
-5. *Then* load `artifact-design` for the type pairing, layout, spacing, and its
-   anti-templating checklist. This skill decides the semantic palette;
-   `artifact-design` executes the craft around it — including steering clear of
-   the AI-design clichés it warns about (defer to its list, don't restate it).
+5. *Then* load your harness's page-craft skill (on Claude Code, `artifact-design`)
+   for the type pairing, layout, spacing, and its anti-templating checklist. This
+   skill decides the semantic palette; the craft skill executes the craft around it
+   — including steering clear of the AI-design clichés it warns about (defer to its
+   list, don't restate it).
 
 ---
 
@@ -181,9 +182,9 @@ Diagram discipline:
 
 When the thing to show is a *dataset* (a trend, a comparison, a distribution), the
 encoding is craft in its own right. There is no self-contained chart *delegate* for
-this medium — the good chart skills either mandate a CDN library (fails the CSP) or
-render raster via Python. So **borrow the judgment and render it as inline SVG
-yourself.** The selection + honesty rules below are distilled from the
+this medium — the good chart skills either mandate a CDN library (which a self-contained
+page can't load — on Claude Code, the Artifact CSP blocks it) or render raster via
+Python. So **borrow the judgment and render it as inline SVG yourself.** The selection + honesty rules below are distilled from the
 `data-visualization` skill (`anthropics/knowledge-work-plugins`, model-invoked,
 medium-agnostic in its guidance).
 
@@ -220,7 +221,8 @@ reads in the same language as the rest of the page.
 Interactivity is welcome *only when it does explanatory work* — letting the reader
 step the mechanism, drive the hard case, or toggle before/after — never for
 engagement. Static-first is the default; an interaction has to pay for itself in
-fidelity or clarity. Keep it CSP-safe: **vanilla JS only, inline, no libraries.**
+fidelity or clarity. Keep it self-contained: **vanilla JS only, inline, no libraries**
+(on Claude Code, the Artifact CSP requires this).
 
 A stepper that walks a sequence one stage at a time — the highest-value pattern for
 a mechanism or a walk:
@@ -261,18 +263,18 @@ control a real `<button>` so it is keyboard-reachable, and gate any motion behin
 
 ## Pair with an inline summary (step 6)
 
-The Artifact is the deliverable, but the conversation should still carry the
-gist — so the reader can act without opening the side panel, and so a later
+The published page is the deliverable, but the conversation should still carry the
+gist — so the reader can act without opening it, and so a later
 session (or a compaction) keeps the substance. After publishing, post in-thread:
 the one-sentence thesis, then the mechanism distilled to a few paragraphs (the
 same through-line as the page, minus the diagrams), then any open decision. Link
-the Artifact. Keep it skimmable; it is the page's abstract, not a second copy.
+the page. Keep it skimmable; it is the page's abstract, not a second copy.
 
 ---
 
-## Artifact constraints checklist
+## Self-contained-page checklist (on Claude Code, the Artifact sandbox)
 
-- [ ] Content only — no `<html>`/`<head>`/`<body>` wrapper (the tool wraps it).
+- [ ] Content only — no `<html>`/`<head>`/`<body>` wrapper (the host wraps it).
 - [ ] All CSS/JS inline; images as `data:` URIs; **no external fonts or CDNs** (CSP blocks them) — use system stacks (`ui-monospace…`, a serif stack, a sans stack).
 - [ ] Body never scrolls sideways: every wide table/diagram/code block in its own `overflow-x:auto` container; images `max-width:100%`.
 - [ ] Theme-aware unless the design deliberately commits to one look (`@media (prefers-color-scheme: dark)` + the viewer's `data-theme` override).

@@ -1,6 +1,6 @@
 ---
 name: illustrated-explainer
-description: "Produces a faithful, easy-to-follow explanation of an unfamiliar concept, system, algorithm, or mechanism for a smart stranger, in whichever medium best fits the content — a self-contained visual page when the subject is structural or has moving parts, a tighter inline answer when it's linear. Grounds the visuals in the subject's own states (color encodes meaning, not decoration), derives structure from the subject rather than a fixed template, shows the hard part at full resolution, and pairs it with a distilled summary in chat. Use when the user asks to explain, illustrate, teach, or walk through how something works; wants a full-resolution, from-scratch, easy-to-read, or explain-to-a-stranger explanation; says they couldn't follow or couldn't see something; or for teaching, onboarding, and architecture or mechanism walkthroughs. Composes with artifact-design for visual craft; discovers specialized craft skills as needed. Not for quick factual answers, one-liners, or code-only replies."
+description: "Produces a faithful, easy-to-follow explanation of an unfamiliar concept, system, algorithm, or mechanism for a smart stranger, in whichever medium best fits the content — a self-contained visual page when the subject is structural or has moving parts, a tighter inline answer when it's linear. Grounds the visuals in the subject's own states (color encodes meaning, not decoration), derives structure from the subject rather than a fixed template, shows the hard part at full resolution, and pairs it with a distilled summary in chat. Use when the user asks to explain, illustrate, teach, or walk through how something works; wants a full-resolution, from-scratch, easy-to-read, or explain-to-a-stranger explanation; says they couldn't follow or couldn't see something; or for teaching, onboarding, and architecture or mechanism walkthroughs. Composes with a page-craft skill (on Claude Code, artifact-design) for visual craft; discovers specialized craft skills as needed. Not for quick factual answers, one-liners, or code-only replies."
 ---
 
 # Illustrated explainer
@@ -17,7 +17,7 @@ Steps 3–5 are where the quality lives. Steps 3 and 5 (grounding the visuals, d
 
 1. **Pin the subject.** Name one concrete subject, its audience (assume a smart stranger — no shared jargon, unless the user names a different audience), and the single thing they should walk away understanding. Everything below serves that one job.
 
-2. **Choose the medium by fit, not habit.** Deliver in whichever form best serves *this* content, among those you render at genuinely high quality — do not default mechanically to one. Judge on a single axis: how much the content must be *seen* to be understood — its structure, states, moving parts — versus merely *read*. The more it must be seen, the more it earns a rich, self-contained visual page; the more it is linear or verbal, the lighter the medium. **Whenever the delivered medium is a published HTML page, it must be self-contained** (see Artifact constraints).
+2. **Choose the medium by fit, not habit.** Deliver in whichever form best serves *this* content, among those you render at genuinely high quality — do not default mechanically to one. Judge on a single axis: how much the content must be *seen* to be understood — its structure, states, moving parts — versus merely *read*. The more it must be seen, the more it earns a rich, self-contained visual page; the more it is linear or verbal, the lighter the medium. **Whenever the delivered medium is a published, self-contained HTML page** — on Claude Code, an **Artifact** — it must honor that target's constraints (see Published-page constraints).
 
 3. **Ground the visuals in the subject's own states.** Before styling, list the subject's real distinctions — the ones the explanation turns on (proven vs unproven, granted vs refused, before vs after, healthy vs failing). Map each to a color so the palette *encodes meaning*; a legend names them once. Only then bring in craft (see Composition). See `references/playbook.md` → "Palette from states".
 
@@ -28,13 +28,13 @@ Steps 3–5 are where the quality lives. Steps 3 and 5 (grounding the visuals, d
 
 5. **Show the structural parts.** Anything with structure — a graph, pipeline, before/after, state machine, data flow, or dataset — gets an inline diagram with a one-line caption and a semantic legend. Prose explains; diagrams show. **Interactivity is welcome when it earns its place** — letting the reader replay or drive the hard part, compare states, or step the mechanism — never as decoration; static-first is the default. See `references/playbook.md` → "Diagram cookbook", "Chart craft", "Earned interactivity".
 
-6. **Pair it with an inline summary.** After delivering a page, put a tight distilled version in the conversation — the thesis plus the mechanism in a few paragraphs — so the thread carries the gist and work can continue without opening the panel.
+6. **Pair it with an inline summary.** After delivering a page, put a tight distilled version in the conversation — the thesis plus the mechanism in a few paragraphs — so the thread carries the gist and work can continue without opening the page.
 
 ## Composition — delegate craft, don't re-implement
 
 Own the pedagogy; borrow the craft. Three rules:
 
-- **Delegate to subordinate pure-craft skills** — ones that own only "how it looks" and hold no opinion on scope, medium, or pedagogy. **Resident hot set:** `artifact-design` for page craft (palette pairing, type, layout, anti-templating) — load it at step 3 once the semantic palette is set. The playbook's diagram and chart cookbook covers the common visual craft in-house.
+- **Delegate to subordinate pure-craft skills** — ones that own only "how it looks" and hold no opinion on scope, medium, or pedagogy. **Resident hot set:** your harness's page-craft skill (on Claude Code, `artifact-design`) for palette pairing, type, layout, and anti-templating — load it at step 3 once the semantic palette is set. The playbook's diagram and chart cookbook covers the common visual craft in-house.
 - **Discover the long tail just-in-time.** For a specialized craft surface a *particular* subject needs (maps, math typesetting, musical notation, molecular structure…), find and vet the right craft skill *at that moment* via the skills ecosystem (`find-skills` / `npx skills find`) rather than a fixed roster. Vet before trusting: a delegate must be reputable, pure-craft, subordinate, and self-contained-compatible (no mandated external CDN library).
 - **Borrow, don't delegate, from opinion-carrying peers.** A skill with its own scope, medium, or pedagogy stance (e.g. a general visual-output generator) is a peer, not a subordinate — lift its concrete techniques into the playbook under your own constraints; never hand it control.
 
@@ -48,6 +48,6 @@ Own the pedagogy; borrow the craft. Three rules:
 - Interactivity, if any, does explanatory work; motion is restrained.
 - It reads as a story with one thread, not a spec with parallel sections.
 
-## Artifact constraints (non-negotiable when the medium is a published HTML page)
+## Published-page constraints (non-negotiable when the medium is a self-contained published page)
 
-Self-contained (inline CSS/JS, no external fonts or CDNs — the CSP blocks them), theme-aware, content-only (no `<html>`/`<head>`/`<body>` wrapper — the tool adds them), with a stable `<title>` and an emoji favicon. Full property-level checklist in `references/playbook.md`.
+Honor whatever sandbox your harness renders self-contained pages in — on Claude Code, an **Artifact**. For Claude Code Artifacts: inline CSS/JS, no external fonts or CDNs (the CSP blocks them), theme-aware, content-only (no `<html>`/`<head>`/`<body>` wrapper — the host adds them), a stable `<title>`, and an emoji favicon. Full property-level checklist in `references/playbook.md`.
