@@ -57,7 +57,7 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### 4. Spawn both sub-agents in parallel
 
-Send a single message with two `Agent` tool calls. Use the `general-purpose` subagent for both.
+Dispatch both sub-agents in a single batch so they run in parallel — a general-purpose sub-agent with no special tooling for each (e.g. in a Claude Code session: one message with two `Agent` tool calls, each using the `general-purpose` subagent).
 
 **Standards sub-agent prompt** — include:
 
