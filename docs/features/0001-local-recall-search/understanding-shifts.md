@@ -103,3 +103,23 @@ This is Delta-2's asymmetry lesson applied to a second axis: the engines' defaul
 
 Correction: the routed code command carries a result cap alongside its line flag, and the output contract is stated over volume as well as location.
 This corrects Design (`Design#D-3-routing-skill-local-search`'s output contract and `Design#D-2-code-recall-engine-ck`'s taught command) and stops there — Spec and Requirements are unchanged, since the contract was right and the realization under-served it.
+
+## Delta-5: an-install-root-is-only-useful-where-the-shell-already-looks
+
+Design placed the code engine's binary at its package manager's **default** install root and treated that directory as being on PATH.
+Both halves are false here, and this is a latent error caught late rather than a reality shift: provisioning (P1) already installs correctly, and only Design's prose was left behind.
+
+Evidence on this machine:
+
+- The package manager's default root is **not on PATH at all**, so a binary installed there would be unreachable by the bare command the skill teaches.
+- Provisioning already passes an explicit install root, landing the binary in the directory these dotfiles themselves put on PATH; `Design#D-5-provisioning-run-after-brew` records that install line correctly.
+  Verified: the binary exists at the explicit root and serves queries offline, while the default-root path does not exist at all.
+- So Design contradicted itself — `Design#D-2-code-recall-engine-ck` named a location that does not exist on the very machine `Design#D-5-provisioning-run-after-brew` provisions, and asserted a PATH membership that was never true.
+
+The durable finding is that **an install root is only useful if it is a directory the shell already searches**.
+A package manager's default root is a property of that tool, not of the machine's PATH — so a realization that relies on it inherits a PATH assumption it does not control.
+This is `Understanding#Delta-1-qmd-runtime-is-path-dependent-not-bun`'s lesson from the other side: there, the fix was to keep an engine *off* PATH so nothing competed with it; here, it is to place one *into* a directory the dotfiles already guarantee is on PATH.
+Both replace an inherited PATH assumption with an owned one — the engine's reachability must be a property the dotfiles establish, not one they hope the machine already has.
+
+Correction: Design names the explicit install root and drops the claim about the default root's PATH membership.
+This corrects `Design#D-2-code-recall-engine-ck` and stops there — the provisioning realization and the observable contract are both already right.

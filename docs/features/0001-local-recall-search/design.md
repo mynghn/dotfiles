@@ -45,7 +45,7 @@ Rationale: [design-rationale.md](design-rationale.md#d-1-prose-recall-engine-qmd
 
 ## D-2: code-recall-engine-ck
 
-Code recall (`Spec#B-2-code-recall-lookup`) is realized by ck (`BeaconBay/ck`) pinned at `ck-search@0.7.11` via cargo, landing a static binary at `~/.cargo/bin/ck`.
+Code recall (`Spec#B-2-code-recall-lookup`) is realized by ck (`BeaconBay/ck`) pinned at `ck-search@0.7.11` via cargo, landing a static binary at `~/.local/bin/ck` — cargo's *default* root is not on PATH here, so D-5 directs the install into the one directory these dotfiles already put there (`Understanding#Delta-5-an-install-root-is-only-useful-where-the-shell-already-looks`).
 Rationale: [design-rationale.md](design-rationale.md#d-2-code-recall-engine-ck).
 
 - Query command the skill teaches: `ck -n --hybrid --topk 10 "<behavior/concept phrase>" <path>` (BM25 + embedding); `--sem` for pure semantic when hybrid over-weights keywords.
@@ -55,7 +55,8 @@ Rationale: [design-rationale.md](design-rationale.md#d-2-code-recall-engine-ck).
   The cap matches this engine's own semantic default rather than inventing a number.
   The engine also ignores `NO_COLOR` and emits ANSI escapes into a pipe; that is cosmetic at ten results and is left alone, `--jsonl --no-snippet` being the escape hatch if a caller ever needs clean machine-readable output.
 - Model cache: `~/.cache/ck`; the per-tree index is `.ck/` at the searched root (the directory D-7 keeps out of version control).
-- No interpreter to pin: a self-contained Rust binary, so D-8's wrapper is not needed here — only `~/.cargo/bin` on PATH.
+- No interpreter to pin: a self-contained Rust binary, so D-8's wrapper is not needed here — the explicit install root is enough, since `~/.local/bin` is already on PATH.
+  The engine is reachable because the dotfiles put it somewhere they control, not because a package manager's default happened to be on PATH — the same assumption D-8 refuses to inherit for the prose engine.
 - Embeddings run in-process (ONNX, cached once); index lives in `.ck/` at the searched tree's root, built on first query and updated incrementally on later ones.
   The engine exposes no model-pull command, so D-5 forces its download by warm-up invocation.
 
@@ -93,7 +94,8 @@ Rationale: [design-rationale.md](design-rationale.md#d-5-provisioning-run-after-
 
 - Toolchain: missing pieces are installed via Homebrew — `node@22` (the pinned qmd interpreter), `rust` (provides cargo for ck), `ripgrep`; if `brew` itself is absent the script fails loudly naming the remedy (never a silent skip).
   bun is not part of the toolchain: qmd's launcher only falls back to bun when no node exists at all, so it could never have been the runtime (`Understanding#Delta-1-qmd-runtime-is-path-dependent-not-bun`).
-- Engines version-pinned for cross-machine uniformity: qmd `@tobilu/qmd@2.5.3` installed by **node@22's own npm into D-8's private prefix** (never the default global one, which lands on PATH), and `cargo install ck-search --version 0.7.11` — pins bumped deliberately, in this repo.
+- Engines version-pinned for cross-machine uniformity: qmd `@tobilu/qmd@2.5.3` installed by **node@22's own npm into D-8's private prefix** (never the default global one, which lands on PATH), and `cargo install ck-search --version 0.7.11 --root "$HOME/.local"` — pins bumped deliberately, in this repo.
+  The code engine's `--root` is load-bearing for the same reason as the prose engine's private prefix, in the opposite direction: it puts the binary where PATH already looks instead of trusting a package manager's default to be there (`Understanding#Delta-5-an-install-root-is-only-useful-where-the-shell-already-looks`).
   Installing qmd under the pinned node is load-bearing, not incidental: its native SQLite dependency is ABI-locked to the installing node, so the installing and invoking node must be the same one D-8 pins.
 - Competing engine copies are removed, not tolerated: any qmd previously installed onto PATH by another package manager is uninstalled, since a leftover copy reintroduces the PATH-order race D-8 exists to eliminate (`Understanding#Delta-1-qmd-runtime-is-path-dependent-not-bun`).
 - Model pre-pull: neither engine exposes a pull command, so the script forces each engine's model download with a **warm-up invocation** against a throwaway corpus at provision time; the query lane never downloads.
