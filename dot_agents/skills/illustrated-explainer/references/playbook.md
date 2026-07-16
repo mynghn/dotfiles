@@ -42,6 +42,14 @@ Method:
    — including steering clear of the AI-design clichés it warns about (defer to its
    list, don't restate it).
 
+6. **Falsify the palette against that list.** Use the craft skill's cliché roster as
+   a *test*, not just styling advice to avoid: run your finished palette against it,
+   and if it resembles one of the generic AI-design defaults it names, treat that as
+   evidence you skipped the state-derivation above — not a coincidence — and re-ground
+   it. A palette actually derived from the subject's own states won't land on a look
+   that appears *regardless* of subject. (This is the palette half of the SKILL's
+   "falsify before building" gate; the structure half is the arc below.)
+
 ---
 
 ## The arc (step 4) — a default to adapt, not a schema
@@ -172,6 +180,7 @@ teal-tagged new; identical structure so the eye compares.
 
 Diagram discipline:
 - One idea per figure. If it needs two captions, it's two figures.
+- One figure is the signature. Give the hardest claim's figure the most craft and weight, and keep the others quiet so it stands out — boldness spent on every figure is spent on none.
 - Label with the subject's real vocabulary (mono font ties code-like terms together).
 - Every figure earns a caption that states the takeaway, not what's drawn.
 - `role="img"` + `aria-label` on each SVG; never rely on color alone (pair hue with shape/dashes/labels).
