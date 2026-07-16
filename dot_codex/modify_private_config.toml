@@ -8,24 +8,32 @@ BEGIN {
   skip_managed_mcp_section = 0
   skip_status_line_array = 0
   previous_blank = 0
+  in_section = 0
   in_tui_section = 0
   tui_section_seen = 0
   status_line_printed = 0
-  printed_any = 0
+  print "# chezmoi-managed: portable Codex defaults"
+  print "approvals_reviewer = \"auto_review\""
+  print ""
+  printed_any = 1
+  previous_blank = 1
 }
 
 function print_status_line() {
   print "status_line = ["
   print "    \"model-with-reasoning\","
+  print "    \"approval-mode\","
   print "    \"current-dir\","
   print "    \"git-branch\","
   print "    \"context-remaining\","
   print "    \"context-window-size\","
-  print "    \"five-hour-limit\","
-  print "    \"weekly-limit\","
   print "    \"used-tokens\","
   print "    \"total-input-tokens\","
   print "    \"total-output-tokens\","
+  print "    \"five-hour-limit\","
+  print "    \"weekly-limit\","
+  print "    \"run-state\","
+  print "    \"task-progress\","
   print "]"
   print "status_line_use_colors = true"
   status_line_printed = 1
@@ -44,6 +52,7 @@ function print_tui_status_line_if_needed() {
 
 /^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
   print_tui_status_line_if_needed()
+  in_section = 1
   in_tui_section = 0
   status_line_printed = 0
 
@@ -76,6 +85,10 @@ function print_tui_status_line_if_needed() {
   }
 
   if ($0 ~ /^[[:space:]]*# chezmoi-managed: (context-engineering compaction policy|portable Codex defaults)[[:space:]]*$/) {
+    next
+  }
+
+  if (!in_section && $0 ~ /^[[:space:]]*approvals_reviewer[[:space:]]*=/) {
     next
   }
 
