@@ -5,6 +5,13 @@ Chezmoi owns the local operating-policy blocks below. Metacognition owns its
 installed AGENTS.md trigger blocks (for example context_engineering,
 prompt_engineering, compaction, and handoff), so this modifier preserves those
 blocks from the live file instead of carrying their content in dotfiles.
+
+Unrecognized blocks are preserved, which is what keeps the other writer's
+spans safe -- so dropping a block from OWNED is not enough to remove it from
+the live file, and RETIRED names the tags to delete instead of preserve.
+
+Every char here is preloaded by every agent session, so the owned blocks carry
+each fact exactly once and stay under BUDGET_CHARS.
 """
 import re
 import sys
@@ -29,6 +36,17 @@ OWNED = {
     "change_discipline",
 }
 
+RETIRED = {
+    "context_discipline",
+    "ko_output_quality",
+    "plan_style",
+    "research_before_planning",
+}
+
+TERMINAL = "change_discipline"
+
+BUDGET_CHARS = 2000
+
 BLOCK_RE = re.compile(r"^<([a-z_]+)>\n.*?^</\1>\n?", re.MULTILINE | re.DOTALL)
 
 
@@ -50,6 +68,12 @@ def canonical_blocks():
     missing = sorted(OWNED - set(found))
     if missing:
         raise SystemExit("modify_AGENTS.md missing owned blocks: " + ", ".join(missing))
+    measured = sum(len(body) for body in found.values())
+    if measured > BUDGET_CHARS:
+        raise SystemExit(
+            "modify_AGENTS.md owned blocks measure {} chars, over the {} budget "
+            "by {}".format(measured, BUDGET_CHARS, measured - BUDGET_CHARS)
+        )
     return found
 
 
@@ -62,6 +86,8 @@ def main():
             if text.strip():
                 extras.append(text.strip("\n"))
             continue
+        if tag in RETIRED:
+            continue
         if tag not in live_by_tag:
             live_by_tag[tag] = text
         elif tag not in OWNED:
@@ -71,6 +97,8 @@ def main():
     emitted = set()
     output = []
     for tag in ORDER:
+        if tag == TERMINAL:
+            continue
         if tag in owned:
             output.append(owned[tag])
             emitted.add(tag)
@@ -79,11 +107,12 @@ def main():
             emitted.add(tag)
 
     for tag, text in live_parts:
-        if tag and tag not in emitted and tag not in OWNED:
+        if tag and tag not in emitted and tag not in OWNED and tag not in RETIRED:
             output.append(text)
             emitted.add(tag)
 
     output.extend(extras)
+    output.append(owned[TERMINAL])
     sys.stdout.write("\n\n".join(part.rstrip("\n") for part in output if part.strip()).rstrip() + "\n")
 
 
