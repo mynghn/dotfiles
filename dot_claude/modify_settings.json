@@ -19,7 +19,7 @@ printf '%s' "$(echo "$input" | jq '
   # Static prompt reduction: ~2k tokens/session (Sonnet), ~2.6k (Opus 4.7 xhigh).
   # Measured on v2.1.117; no cache-prefix invalidation observed.
   .includeGitInstructions = false |
-  .enabledPlugins["mgrep@Mixedbread-Grep"] = true |
+  .enabledPlugins = ((.enabledPlugins // {}) | with_entries(select(.key | endswith("@Mixedbread-Grep") | not))) |
   .hooks.PreToolUse = [{
     "matcher": "Edit|Write|MultiEdit",
     "hooks": [{"type": "command", "command": "~/.claude/hooks/chezmoi-guard.sh"}]

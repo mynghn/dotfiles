@@ -6,25 +6,62 @@ input=$(cat || true)
 printf '%s\n' "$input" | awk '
 BEGIN {
   skip_managed_mcp_section = 0
+  skip_status_line_array = 0
   previous_blank = 0
-  in_section = 0
+  in_tui_section = 0
+  tui_section_seen = 0
+  status_line_printed = 0
   printed_any = 0
-  print "# chezmoi-managed: context-engineering compaction policy"
-  print "compact_prompt = \"Summarize the conversation to free context, in the context-engineering spirit. Keep the working set: the current goal, key decisions and their rationale, live constraints, and open threads or next steps. Preserve must-not-lose instructions and the task statement verbatim. Replace bulky content with reloadable references (file paths, commit SHAs, URLs) instead of full payloads. Drop resolved tangents, dead ends, verbose tool output, and superseded attempts. Produce the smallest high-signal summary that still lets the work continue.\""
-  print ""
+}
+
+function print_status_line() {
+  print "status_line = ["
+  print "    \"model-with-reasoning\","
+  print "    \"current-dir\","
+  print "    \"git-branch\","
+  print "    \"context-remaining\","
+  print "    \"context-window-size\","
+  print "    \"usage-limit\","
+  print "    \"secondary-usage-limit\","
+  print "    \"five-hour-limit\","
+  print "    \"daily-limit\","
+  print "    \"weekly-limit\","
+  print "    \"monthly-limit\","
+  print "    \"annual-limit\","
+  print "    \"used-tokens\","
+  print "    \"total-input-tokens\","
+  print "    \"total-output-tokens\","
+  print "]"
+  print "status_line_use_colors = true"
+  status_line_printed = 1
+  previous_blank = 0
   printed_any = 1
-  previous_blank = 1
+}
+
+function print_tui_status_line_if_needed() {
+  if (in_tui_section && !status_line_printed) {
+    if (printed_any && !previous_blank) {
+      print ""
+    }
+    print_status_line()
+  }
 }
 
 /^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
-  if ($0 ~ /^[[:space:]]*\[mcp_servers\.(mgrep|context7)\][[:space:]]*$/) {
+  print_tui_status_line_if_needed()
+  in_tui_section = 0
+  status_line_printed = 0
+
+  if ($0 ~ /^[[:space:]]*\[mcp_servers\.context7\][[:space:]]*$/) {
     skip_managed_mcp_section = 1
-    in_section = 1
     next
   }
 
   skip_managed_mcp_section = 0
-  in_section = 1
+  if ($0 ~ /^[[:space:]]*\[tui\][[:space:]]*$/) {
+    in_tui_section = 1
+    tui_section_seen = 1
+  }
   print
   previous_blank = 0
   printed_any = 1
@@ -32,15 +69,30 @@ BEGIN {
 }
 
 {
+  if (skip_status_line_array) {
+    if ($0 ~ /\]/) {
+      skip_status_line_array = 0
+    }
+    next
+  }
+
   if ($0 ~ /^[[:space:]]*# chezmoi-managed MCP servers[[:space:]]*$/) {
     next
   }
 
-  if ($0 ~ /^[[:space:]]*# chezmoi-managed: context-engineering compaction policy[[:space:]]*$/) {
+  if ($0 ~ /^[[:space:]]*# chezmoi-managed: (context-engineering compaction policy|portable Codex defaults)[[:space:]]*$/) {
     next
   }
 
-  if (!in_section && $0 ~ /^[[:space:]]*(model|model_reasoning_effort|tool_output_token_limit|web_search|compact_prompt)[[:space:]]*=/) {
+  if (in_tui_section && $0 ~ /^[[:space:]]*status_line[[:space:]]*=/) {
+    print_status_line()
+    if ($0 !~ /\]/) {
+      skip_status_line_array = 1
+    }
+    next
+  }
+
+  if (in_tui_section && $0 ~ /^[[:space:]]*status_line_use_colors[[:space:]]*=/) {
     next
   }
 
@@ -60,15 +112,21 @@ BEGIN {
 }
 
 END {
+  print_tui_status_line_if_needed()
+
+  if (!tui_section_seen) {
+    if (printed_any && !previous_blank) {
+      print ""
+    }
+    print "[tui]"
+    print_status_line()
+  }
+
   if (printed_any && !previous_blank) {
     print ""
   }
 
   print "# chezmoi-managed MCP servers"
-  print "[mcp_servers.mgrep]"
-  print "command = \"mgrep\""
-  print "args = [\"mcp\"]"
-  print ""
   print "[mcp_servers.context7]"
   print "command = \"npx\""
   print "args = [\"-y\", \"@upstash/context7-mcp\"]"
