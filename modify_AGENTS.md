@@ -11,29 +11,21 @@ import sys
 
 ORDER = (
     "operating_frame",
-    "context_discipline",
     "context_engineering",
     "prompt_engineering",
     "compaction",
     "handoff",
-    "ko_output_quality",
     "document_brevity",
     "implementation",
-    "plan_style",
     "code_investigation",
-    "research_before_planning",
     "change_discipline",
 )
 
 OWNED = {
     "operating_frame",
-    "context_discipline",
-    "ko_output_quality",
     "document_brevity",
     "implementation",
-    "plan_style",
     "code_investigation",
-    "research_before_planning",
     "change_discipline",
 }
 
@@ -97,83 +89,43 @@ def main():
 
 DOTFILES_AGENTS_BLOCKS = r"""
 <operating_frame>
-Context is finite working memory, not a free buffer: every token you carry
-spends an attention budget that low-value tokens tax later. Curate with four
-levers — select (pull in only what the step needs), compress (carry the
-distilled conclusion, not the raw material), write (persist
-plan/state/decisions to a durable file so they survive compaction or a fresh
-session), isolate (push breadth-heavy work the window shouldn't hold — wide
-research, broad code/web scans — into a sub-agent that returns its conclusion,
-not its raw trail). Read as widely as correctness demands; retain narrowly and
-re-read on demand.
-Branch base (referenced below): latest production branch, synced with remote —
-`main` → `master` → repo default — unless the user names one.
+Context is finite working memory: low-value tokens tax later reasoning.
+Curate with four levers: select only what the step needs; compress to
+conclusions, not raw material; write plan/state/decisions to a file so they
+survive compaction or a new session; isolate breadth-heavy work (wide
+research, broad code/web scans) in a sub-agent returning conclusions, not
+trails. Read as widely as correctness needs; retain narrowly, a 3-5 fact
+summary driving the next step; re-read on demand. Take only a spec or plan's
+current-step slice; skip stale or superseded parts.
 </operating_frame>
-
-<context_discipline>
-Keep a 3-5 fact working summary driving the next step. From a spec or plan,
-take only the current step's slice — ignore stale or superseded sections.
-</context_discipline>
-
-<ko_output_quality>
-Before producing Korean output that will be shared or persist — Slack
-messages/announcements, repo documents, Confluence/Jira content, PR
-descriptions and review comments, Korean commit messages, Korean code
-comments, reports/artifacts meant for sharing — invoke the `ko-quality`
-skill first and apply its principles from the first sentence (heavy
-artifacts also get its post-hoc review pipeline). Also invoke it when the
-user says an in-session output will be shared or turned into a document.
-It governs quality only for output already being written in Korean —
-never switch an output's language to trigger it. `/ko-quality` invokes it
-manually anytime.
-Why: the skill description alone won't fire at the moment of writing;
-quality must be applied before the first sentence, not retrofitted.
-</ko_output_quality>
 
 <document_brevity>
 Write brief by default; stop when the point lands. Lead with the conclusion,
-then distill support into points that stand alone. When depth is genuinely
-required, segregate it into a separate linked file rather than inflating the
-main one. Respect the document's conventions.
+then distill support into points that stand alone. Put genuinely required
+depth in a separate linked file, not the main one. A document's own
+conventions outrank these defaults.
 </document_brevity>
 
 <implementation>
-Treat plans and specs as intent + constraints, not scripts: re-derive the
-implementation from current code, tests, and constraints at each chunk. Work
-on a feature branch off the branch base unless the user specifies one. Surface
-tradeoffs and ambiguities for the user rather than resolving them silently.
-Move autonomously through straightforward chunks; pause at decision points —
-irreversible changes, multiple valid approaches, unclear intent.
-Why: mechanical execution strips nuance, but pausing every chunk wastes flow
-— interact at decisions, not on a cadence.
+Plans and specs are intent, not scripts: re-derive each chunk from current
+code, tests, and constraints. Plan as goals + constraints; number tasks only
+when the full sequence is obvious upfront. Feature-branch off the branch base
+by default. Move autonomously; pause and surface at decision points —
+irreversible or far-reaching changes, rival approaches, unclear intent, a
+tradeoff or ambiguity you'd settle alone.
 </implementation>
 
-<plan_style>
-Default to abstract plans (goals + constraints). Use concrete numbered task
-lists only when the full sequence is obvious before starting.
-Why: task lists flatten cross-cutting concerns into independent items.
-</plan_style>
-
 <code_investigation>
-Investigate from the branch base so "current behavior" is what's shipped.
-Read the paths needed to make the answer or change defensible — trace call
-sites, data flow, tests, and config where they affect behavior. Verify
-actual implementations, not behavior inferred from names or signatures.
-Why: assumptions compound into wrong answers; targeted reading is cheap,
-exhaustive reading is not the goal.
+Branch base (what ships): main → master → repo default, synced with remote,
+unless the user names one; investigate from it. Read what makes an answer or
+change defensible: trace call sites, dataflow, tests, config, project docs.
+Verify implementations, not names or signatures. On non-trivial external or
+current facts, claim and plan from primary sources, not memory.
 </code_investigation>
 
-<research_before_planning>
-For non-trivial decisions on external or current facts, fetch primary
-sources (official docs, SOTA, engineering guides) before planning; for
-repo-local decisions, treat code, tests, and project docs as the primary
-sources. Don't rely on training knowledge for time-sensitive claims.
-</research_before_planning>
-
 <change_discipline>
-Before editing, inspect relevant local changes. Keep patches scoped. Never
-revert unrelated or user-authored work. Ask before broad refactors, contract
-changes, migrations, or ambiguous behavior shifts. Verify with the smallest
+Inspect relevant local changes before editing. Keep patches scoped to the
+task; never revert unrelated or user-authored work. Verify with the smallest
 meaningful test, typecheck, lint, or diff.
 </change_discipline>
 """

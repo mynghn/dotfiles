@@ -32,14 +32,15 @@ The size envelopes sum to ≤ 2,000 chars with tag lines (satisfies `Spec#C-1-ow
 | block | ≤ chars | carries (sole home of) |
 |---|---|---|
 | `operating_frame` | 600 | finite-attention frame; four levers (select / compress / write / isolate); read-widely-retain-narrowly; 3–5-fact working summary + current-step slice (absorbs `context_discipline`) |
-| `document_brevity` | 300 | current content as-is: conclusion-first, stop when it lands, segregate depth, respect conventions |
+| `document_brevity` | 295 | the same four facts it carries today, wording tightened to fit: conclusion-first, stop when it lands, segregate depth, conventions outrank these defaults |
 | `implementation` | 450 | plans-as-intent; feature branch off branch base; surface tradeoffs; autonomy through straightforward chunks with pause-at-decision-points (**the** ask-before-acting home); abstract-plans default, numbered lists only when the sequence is obvious (absorbs `plan_style`) |
-| `code_investigation` | 400 | **the** branch-base definition (moves in from `operating_frame`); investigate from branch base; read enough to be defensible; verify implementations, not names; **the** primary-sources rule — repo-local: code/tests/docs; external/current: primary docs (absorbs `research_before_planning`) |
-| `change_discipline` | 250 | pure hard lines: inspect local changes first; scoped patches; never revert unrelated or user-authored work; verify with the smallest meaningful check — its ask-before-X sentence is removed (that concern's home is `implementation`) |
+| `code_investigation` | 415 | **the** branch-base definition (moves in from `operating_frame`); investigate from branch base; read enough to be defensible; verify implementations, not names; **the** primary-sources rule — repo-local: code/tests/docs; external/current: primary docs (absorbs `research_before_planning`) |
+| `change_discipline` | 240 | pure hard lines: inspect local changes first; scoped patches; never revert unrelated or user-authored work; verify with the smallest meaningful check — its ask-before-X sentence is removed (that concern's home is `implementation`) |
 
 - `ko_output_quality` retires (see `D-3`); `context_discipline`, `plan_style`, `research_before_planning` are absorbed as mapped above.
 - "Why:" lines survive only where the reason changes runtime behavior; provenance-only Whys (entry-slug lists) are dropped.
 - Exact wording is authored at implement time against the per-block envelopes; the gate (D-2) is the backstop.
+- The envelopes are a design-time allocation, reconciled against the authored prose at implement time (`Understanding#Delta-1-d-1-envelopes-were-a-pre-prose-estimate`); they still sum to exactly 2,000, so the reconciliation moved chars between blocks without touching `Spec#C-1-owned-size-budget`.
 - WHY: grill decisions D1/D3 of this round's framing, grounded in the measured activation evidence — see [design-rationale.md#D-1-five-block-owned-set](design-rationale.md).
 
 ### D-2: apply-time-size-gate
