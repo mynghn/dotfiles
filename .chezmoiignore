@@ -1,0 +1,4 @@
+# Planning artifacts belong to this repo's history, not to $HOME.
+# Without this, chezmoi treats docs/ as managed content and materializes
+# ~/docs/features/... on every apply.
+docs

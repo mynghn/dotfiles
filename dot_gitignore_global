@@ -1,0 +1,7 @@
+*~
+.DS_Store
+
+**/.claude/settings.local.json
+
+# Per-tree semantic search indexes, rebuilt on demand by the search engine.
+.ck/
