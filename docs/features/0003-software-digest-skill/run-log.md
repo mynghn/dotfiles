@@ -51,6 +51,21 @@ fails without it and passes with it.
   confirming the symbol enclosing it. Both are the same failure: **a claim asserted over a wider span
   than the one actually checked.**
 
+## Matrix 2 — skill @`358734c`
+
+Digests regenerated. The span rule shows up in the drafting itself: s3's runner reports that its
+verification pass caught, in its own draft, three defects of exactly the classes that failed matrix 1
+— an anchor on line 1 of a 0-byte `py.typed`; two whole-source negatives ("the repo doesn't warn
+about background-task durability", "…doesn't mention request-ID middleware") both false against
+`docs/background.md:2-5,76-78` and `docs/middleware.md:868-870`; and three anchors sitting on
+`@property` decorator lines or an off-by-one signature line, moved onto the symbols they claimed. Its
+words: both negatives "were found only because the skill requires searching before writing an edge."
+
+- **s1 — rerunning** (first attempt lost to a connection failure mid-write, not a skill fault;
+  fixture verified clean at `c60f0c5` afterwards)
+- **s2 — pending**
+- **s3 — digest written**, 79 anchors, 8 sections, 2 figures, 5 self-check questions
+
 ## Carried forward (for L5 review, not blocking)
 
 - **Self-referential counts.** The quantity rule says "recomputed from the source"; a count of the
