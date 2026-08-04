@@ -34,7 +34,9 @@ Forces: the regrowth mechanism is "any future well-meaning edit"; the gate must 
 - Character count over token count: deterministic, dependency-free, and stable across tokenizer versions; ≈ 500 tokens at the ~4 chars/token rate the audit used.
   Invalidation trigger: if a future tokenizer diverges wildly from ~4 chars/token for this text, revisit the constant, not the mechanism.
 
-## D-3: retired-tag-registry
+## D-3: retired-tag-registry (retired)
+
+> Retired per `Understanding#Delta-2-retired-tags-need-no-registry` — the "one-time manual deletion" alternative rejected below won: the rejection's resurrection scenario ("any other machine applying the dotfiles… resurrects the span") was wrong for fresh applies (empty stdin carries no spans) and for hand-deleted spans (nothing re-adds them); only a backup restore resurrects, accepted at this operator's device count.
 
 Forces: the merge preserves unknown tags by design (that is what protects upstream spans), so a retired owned tag is indistinguishable from a foreign span unless the script is told otherwise — confirmed behavior, `research.md` → apply-merge-behavior.
 
@@ -45,7 +47,10 @@ Forces: the merge preserves unknown tags by design (that is what protects upstre
   Any other machine applying the dotfiles, or any restore from backup, resurrects the span forever (the merge would re-preserve it as unknown).
 - Invalidation trigger: if the upstream framework ever standardizes a cross-writer retirement protocol for the shared file, fold this set into it.
 
-## D-4: terminal-block-placement
+## D-4: terminal-block-placement (retired)
+
+> Retired per `Understanding#Delta-3-recency-misattributed-to-file-tail` — the force itself dissolved: C-4's premise ("final block, where session recall is strongest") confused position-in-file with position-in-window.
+> Superseded by D-5.
 
 Forces: `Spec#C-4-hard-lines-terminal` must hold against spans this script cannot know — the upstream round will upsert a checkpoint block under a tag that does not exist yet.
 
@@ -53,3 +58,13 @@ Forces: `Spec#C-4-hard-lines-terminal` must hold against spans this script canno
   It holds for any future tag without coordination.
 - Alternative — add the future checkpoint tag to ORDER once known: rejected as the mechanism (requires knowing the name, breaks for the tag after that); ORDER placement remains available as cosmetic refinement for *known* tags.
 - Placement-vs-integrity note: C-3 guarantees span *content* byte-exact; position is C-4's to own — moving an unknown span above the terminal block is required behavior, not a pass-through violation.
+
+## D-5: head-lead-emitter
+
+Forces: the sourced grounding (`context-engineering/knowledge/lost-in-the-middle.md`, Liu et al., TACL 2023) places the recall hot spots at the edges of the *window*; `~/AGENTS.md` is preloaded, so the whole file sits in the primacy zone and its tail never borders the live conversation — last-in-file buys nothing, while the file's head is the one hot spot it can reach.
+
+- Chosen: reshape `ORDER` (frame first, hard lines second) and delete the terminal machinery; the head is structurally safe because every non-`ORDER` path appends, so the guarantee costs zero code.
+- Alternative — keep the terminal mechanism, invert it (emit `change_discipline` first by held-back rule): rejected; a rule-based head guard would re-create the constant/guard/coupling for a position the plain forward pass already guarantees.
+- Alternative — hard lines in slot 1, frame second: rejected; a frame conditions only what follows it, the hard lines precede nothing, and across ~2,000 chars slot 1 vs slot 2 is marginal — reading function breaks the tie, not recall position.
+- Evidence-standard note: D-4 was adopted on mechanism-plausibility while D-1 demanded measured evidence; this decision re-aligns the round to one standard by resting on the sourced entry and on mechanism-cost, with the recall-delta claim explicitly not relied on (Delta-3's caveats).
+- Invalidation trigger: if the assembled system prompt is ever shown to place `AGENTS.md` deep enough that its tail borders the live conversation, or an activation study measures a real terminal-position benefit, reopen placement.

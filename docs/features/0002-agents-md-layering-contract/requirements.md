@@ -17,7 +17,7 @@ User stories:
 
 - **Consolidated invariants** — the nine owned blocks collapse to about five, each retained fact stated exactly once.
   The context frame absorbs the working-set discipline; implementation absorbs plan style; investigation absorbs research sourcing and the branch-base definition; the Korean-output block retires because its skill's own description already carries the trigger list and timing.
-- **Hard lines keep the edge** — the must-never-violate rules remain the file's final block, where session recall is strongest.
+- **Hard lines keep the edge** — the must-never-violate rules sit at the head of the file, immediately after the context frame: the file is preloaded at the window's start, so its head is the recall hot spot it can actually reach — its tail never borders the live conversation (`Understanding#Delta-3-recency-misattributed-to-file-tail`).
 - **Regrowth blocked at apply time** — when the owned blocks exceed their budget, applying the dotfiles fails with a message naming the overage, so growth becomes a conscious decision instead of drift.
 
 Success signal: the owned-block footprint drops by at least half (~72 → ~35 lines, ~1,050 → ≤ ~500 tokens), a search for any retained invariant finds one prose home, and a deliberately over-budget edit is rejected at apply time.

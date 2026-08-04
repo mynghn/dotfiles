@@ -6,18 +6,25 @@ installed AGENTS.md trigger blocks (for example context_engineering,
 prompt_engineering, compaction, and handoff), so this modifier preserves those
 blocks from the live file instead of carrying their content in dotfiles.
 
-Unrecognized blocks are preserved, which is what keeps the other writer's
-spans safe -- so dropping a block from OWNED is not enough to remove it from
-the live file, and RETIRED names the tags to delete instead of preserve.
+Unrecognized blocks are preserved and re-emitted after the ordered blocks,
+which is what keeps the other writer's spans safe. It also means retiring an
+owned block takes a one-time manual deletion from each machine's live file --
+the merge cannot tell a retired span from a foreign one.
 
 Every char here is preloaded by every agent session, so the owned blocks carry
 each fact exactly once and stay under BUDGET_CHARS.
+
+The file is preloaded at the window's head, so early slots are the recall hot
+spot it can actually reach (its tail never borders the live conversation) --
+the frame leads because it conditions everything after it, and the hard lines
+sit second. The head cannot be displaced: every path outside ORDER appends.
 """
 import re
 import sys
 
 ORDER = (
     "operating_frame",
+    "change_discipline",
     "context_engineering",
     "prompt_engineering",
     "compaction",
@@ -25,25 +32,15 @@ ORDER = (
     "document_brevity",
     "implementation",
     "code_investigation",
-    "change_discipline",
 )
 
 OWNED = {
     "operating_frame",
+    "change_discipline",
     "document_brevity",
     "implementation",
     "code_investigation",
-    "change_discipline",
 }
-
-RETIRED = {
-    "context_discipline",
-    "ko_output_quality",
-    "plan_style",
-    "research_before_planning",
-}
-
-TERMINAL = "change_discipline"
 
 BUDGET_CHARS = 2000
 
@@ -86,8 +83,6 @@ def main():
             if text.strip():
                 extras.append(text.strip("\n"))
             continue
-        if tag in RETIRED:
-            continue
         if tag not in live_by_tag:
             live_by_tag[tag] = text
         elif tag not in OWNED:
@@ -97,8 +92,6 @@ def main():
     emitted = set()
     output = []
     for tag in ORDER:
-        if tag == TERMINAL:
-            continue
         if tag in owned:
             output.append(owned[tag])
             emitted.add(tag)
@@ -107,12 +100,11 @@ def main():
             emitted.add(tag)
 
     for tag, text in live_parts:
-        if tag and tag not in emitted and tag not in OWNED and tag not in RETIRED:
+        if tag and tag not in emitted and tag not in OWNED:
             output.append(text)
             emitted.add(tag)
 
     output.extend(extras)
-    output.append(owned[TERMINAL])
     sys.stdout.write("\n\n".join(part.rstrip("\n") for part in output if part.strip()).rstrip() + "\n")
 
 
@@ -127,6 +119,12 @@ trails. Read as widely as correctness needs; retain narrowly, a 3-5 fact
 summary driving the next step; re-read on demand. Take only a spec or plan's
 current-step slice; skip stale or superseded parts.
 </operating_frame>
+
+<change_discipline>
+Inspect relevant local changes before editing. Keep patches scoped to the
+task; never revert unrelated or user-authored work. Verify with the smallest
+meaningful test, typecheck, lint, or diff.
+</change_discipline>
 
 <document_brevity>
 Write brief by default; stop when the point lands. Lead with the conclusion,
@@ -151,12 +149,6 @@ change defensible: trace call sites, dataflow, tests, config, project docs.
 Verify implementations, not names or signatures. On non-trivial external or
 current facts, claim and plan from primary sources, not memory.
 </code_investigation>
-
-<change_discipline>
-Inspect relevant local changes before editing. Keep patches scoped to the
-task; never revert unrelated or user-authored work. Verify with the smallest
-meaningful test, typecheck, lint, or diff.
-</change_discipline>
 """
 
 

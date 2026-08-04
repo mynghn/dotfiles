@@ -2,22 +2,22 @@
 
 ## Architecture
 
-The apply-time merge (the `modify_AGENTS.md` chezmoi modify script) stays the single writer of the shared file's owned half; this round changes its inputs (5 canonical blocks instead of 9), adds a size gate, a retired-tag drop, and terminal-block placement.
+The apply-time merge (the `modify_AGENTS.md` chezmoi modify script) stays the single writer of the shared file's owned half; this round changes its inputs (5 canonical blocks instead of 9), adds a size gate, and leads the file with the frame + hard-lines head.
 
 ```
  dotfiles source (modify_AGENTS.md)             live ~/AGENTS.md --(stdin)--+
  +------------------------------+                                          |
  | DOTFILES_AGENTS_BLOCKS       |                                          v
  |   5 owned blocks (D-1)       |                                 parse <tag> spans
- | OWNED / ORDER / RETIRED      |                                 live_by_tag / extras
+ | OWNED / ORDER (D-5)          |                                 live_by_tag / extras
  | BUDGET_CHARS = 2000          |                                          |
  +--------------+---------------+                                          |
                 v                                                          |
    size gate (D-2) -- over budget --> SystemExit(measured vs budget)       |
                 |                       = apply fails, no write            |
                 v                                                          v
-   merge: owned <- source | known-foreign <- live | RETIRED dropped (D-3)
-          unknown tags placed before the terminal block (D-4)
+   merge: emit ORDER (head: frame, hard lines) | owned <- source | known-foreign <- live
+          unknown tags + extras append at the tail (D-5)
                 |
                 v
    stdout --> chezmoi writes ~/AGENTS.md <--symlink-- ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md
@@ -51,18 +51,28 @@ The size envelopes sum to ≤ 2,000 chars with tag lines (satisfies `Spec#C-1-ow
 - A `SystemExit` from a modify script aborts that target's update — chezmoi writes nothing (the no-partial-write half of B-1).
 - WHY (alternative weighed): apply-time gate over a pre-commit hook — see [design-rationale.md#D-2-apply-time-size-gate](design-rationale.md).
 
-### D-3: retired-tag-registry
+### D-3: retired-tag-registry (retired)
 
-A new `RETIRED = {"ko_output_quality", "context_discipline", "plan_style", "research_before_planning"}` set in `modify_AGENTS.md`; the merge drops any live span whose tag is in `RETIRED` (never emitted, never treated as unknown) — realizing `Spec#B-3-retired-blocks-leave-the-file`.
+Retired per `Understanding#Delta-2-retired-tags-need-no-registry`: the resurrection premise was overstated (a fresh apply cannot resurrect; a hand-deleted span stays deleted), and the registry accretes forever.
+Retirement is now a one-time manual deletion per machine, sequenced in `Tasks#T:M4`; the merge carries no `RETIRED` set.
 
-- Absorbed blocks are retired tags too: their live spans must vanish, not survive as unknowns (the confirmed merge behavior would otherwise keep them forever — `research.md` → apply-merge-behavior).
-- Declarative and idempotent: correct on this machine, any other machine applying later, and any stale live copy.
-- WHY (alternative weighed): registry over one-time manual deletion — see [design-rationale.md#D-3-retired-tag-registry](design-rationale.md).
+Original decision: a `RETIRED = {"ko_output_quality", "context_discipline", "plan_style", "research_before_planning"}` set in `modify_AGENTS.md`; the merge drops any live span whose tag is in `RETIRED` — realizing `Spec#B-3-retired-blocks-leave-the-file` (retired).
+Original WHY: [design-rationale.md#D-3-retired-tag-registry](design-rationale.md).
 
-### D-4: terminal-block-placement
+### D-4: terminal-block-placement (retired)
 
-The merge emits the terminal owned block (`change_discipline`) last, after unknown tags and extras — unknown spans are inserted before it, not appended at EOF — realizing `Spec#C-4-hard-lines-terminal`.
+Retired per `Understanding#Delta-3-recency-misattributed-to-file-tail`: the recency it defended belongs to the window, not the file — a preloaded file's tail never borders the live conversation, so the mechanism spent code guarding the slot that matters least.
+Superseded by `D-5`.
 
-- Mechanism: emit per ORDER holding back `change_discipline`; append unknown tags and extras (byte-identical content, `Spec#C-3-foreign-span-pass-through`); emit `change_discipline` last.
-- This is what keeps the upstream round's future checkpoint block (a tag this script won't know) from landing below the hard lines.
-- WHY: the confirmed append-at-EOF behavior would break C-4 the day upstream upserts a new tag — see [design-rationale.md#D-4-terminal-block-placement](design-rationale.md).
+Original decision: emit the terminal owned block (`change_discipline`) last, after unknown tags and extras — realizing `Spec#C-4-hard-lines-terminal` (retired).
+Original WHY: [design-rationale.md#D-4-terminal-block-placement](design-rationale.md).
+
+### D-5: head-lead-emitter
+
+`ORDER` is reshaped to lead with the head — `operating_frame`, then `change_discipline`, then the four upstream anchors, then the remaining owned blocks — and the emitter is a plain forward pass: emit `ORDER` (owned from source, known-foreign from live), then append unknown tags and extras at the tail — realizing `Spec#C-5-hard-lines-lead`.
+
+- The head needs no guard: every non-`ORDER` emitter path is an append, so no span another writer adds can render above `ORDER[0]` — the structural guarantee replaces D-4's held-back terminal block (no `TERMINAL` constant, no skip guard, no special-case append, no `owned[TERMINAL]` coupling).
+- `operating_frame` keeps slot 1 over the hard lines: a frame conditions only what follows it, while the hard lines are self-contained imperatives — they need a hot slot but precede nothing; slot 2 keeps them in the primacy neighborhood.
+- Stated tradeoff: the upstream round's future checkpoint block (a tag this script won't know) appends at the tail until its name is added to `ORDER` — acceptable because the tail is now the least-valued slot and intra-file position effects at this file size are weak (`Understanding#Delta-3-recency-misattributed-to-file-tail`); adding the tag to `ORDER` once known remains a cosmetic refinement.
+- Ownership is unchanged: `ORDER` sequences known-foreign tags but their content always passes through from the live file byte-identical (`Spec#C-3-foreign-span-pass-through`).
+- WHY: [design-rationale.md#D-5-head-lead-emitter](design-rationale.md).
