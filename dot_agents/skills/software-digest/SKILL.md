@@ -133,10 +133,12 @@ Check each claim at the span it covers, not at the span you happened to read:
   you claim. When you name the symbol it belongs to, confirm that symbol's own boundaries enclose the
   line: a line sitting in a neighbouring helper or class reads as confirmation while saying something
   else;
-- a claim about **the whole source** — "only here", "nowhere else", "not in this repository", "the
-  only place that" — is settled by an exhaustive search before it is written, documentation included.
-  Scope taken from where you expected the answer to live, rather than from looking, sends the reader
-  away from a source that held it;
+- a claim about **the whole source** is settled by an exhaustive search before it is written,
+  documentation included. These wear two disguises: the negative one — "only here", "nowhere else",
+  "not in this repository" — and the enumeration, which claims completeness without a negative word
+  in it. "The three places that read this field", "these are the call sites", "the four states it can
+  be in": each is a claim about everywhere you did not look. Scope taken from where you expected the
+  answer to live, rather than from looking, sends the reader away from a source that held it;
 - every quantity — a count of files, a number of lines, a size, a range — was recomputed from the
   source as you wrote it. A number carried over from earlier reading is the easiest thing in a digest
   to get wrong and the hardest for a reader to think to doubt;
