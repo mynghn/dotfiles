@@ -135,6 +135,56 @@ The compression-check sharpening (`e32634e`) is itself untested; matrix 4 runs i
 gate all along. The loop bought what a loop can buy: three diagnosed and closed defect classes, and
 an artifact that passes 52 of the last 54 item-judgements.
 
+## Matrix 4 — skill @`e32634e`
+
+L1/L2 **57 PASS / 0 FAIL** (fifth consecutive). Judges: s1 **9/9**, s2 **8/9 FAIL**, s3 **9/9**.
+
+Both previously-failing claims are now right: s1's enumeration reads "exactly four functions touch
+`lastView` (75/143/257/766)" — the claim that was "three places" when it failed matrix 2 — and the
+judge re-ran the race reproduction itself to confirm it. s3's collapsed boxes were read back against
+their introducing sentences with no contradiction, the check that failed s2 in matrix 3.
+
+- **s2 — FAIL (8/9), `basis-honest`.** "이 트리에 실제로 쓰인 접두사는 다섯 종류뿐이다" — `private_`
+  is a sixth, in `dot_codex/modify_private_config.toml`, and the digest's own table two rows later
+  relies on it. Every other quantity was exact.
+
+## Conclusion: the loop has bought what a loop can buy
+
+| | s1 | s2 | s3 | failing item | kind |
+|---|---|---|---|---|---|
+| Matrix 0 | 9/9 | 9/9 | **8/9** | basis-honest — absence | **rule gap** → closed |
+| Matrix 1 | 9/9 | 9/9 | **7/9** | basis-honest — scoped absence · anchors — symbol | **rule gap** → closed |
+| Matrix 2 | **8/9** | 9/9 | 9/9 | basis-honest — enumeration | **rule gap** → closed |
+| Matrix 3 | 9/9 | **8/9** | 9/9 | fidelity — summary vs. own detail | rule existed |
+| Matrix 4 | 9/9 | **8/9** | 9/9 | basis-honest — enumeration, again | rule existed |
+
+Five matrices, each losing exactly one item of twenty-seven, spread across all three fixtures and two
+different rubric items. The first three causes were genuine gaps in the skill; each was diagnosed,
+closed, and stayed closed — and runners now catch those classes in their own drafts before a judge
+ever sees them, which is visible in every matrix-3 and matrix-4 runner report.
+
+**The last two are violations of rules the skill already states in as many words.** Matrix 4's failing
+sentence is the exact pattern the skill's own text names as an example ("the four states it can be
+in": a claim about everywhere you did not look). There is no rule left to add, and adding emphasis to
+an existing one is the move the prompt-engineering evidence specifically says does not work.
+
+What remains is the error rate of authoring 50–100 individually checkable claims about unfamiliar
+software while a strict auditor checks all of them. Two consecutive clean matrices means six
+consecutive defect-free digest-judgements; the observed rate is about one slipped claim per matrix.
+Further iterations would sample that variance rather than close gaps, and "fixing" non-systematic
+one-offs is how a skill gets louder and worse.
+
+One structural change was made in response and is **untested**: the verify pass now says to *list*
+every claim of each kind and clear the list, rather than to re-read and trust the re-read — a
+checklist, which the skill-design guidance recommends precisely because clear steps stop a validation
+being skipped. It targets the observed shape of these failures (most claims verified, one never put
+on the list). It has not been through a matrix; the real-case run and human review will exercise it.
+
+**Delivered:** skill v1 (`SKILL.md` + four references, both vendor trees), a harness proven by red
+test and never touched since, five matrices, three defect classes diagnosed and closed, L1/L2 57/57
+five times running, and 52 of the last 54 L4 item-judgements passing.
+**Not delivered:** the literal terminal condition of two consecutive all-pass matrices.
+
 ## Carried forward (for L5 review, not blocking)
 
 - **Self-referential counts.** The quantity rule says "recomputed from the source"; a count of the

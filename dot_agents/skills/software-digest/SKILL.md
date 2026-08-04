@@ -127,6 +127,11 @@ Group by what the work is trying to accomplish, and let the files fall where the
 A wrong map is worse than no map, because the reader cannot check it — that is precisely why they
 asked. Re-open the source and confirm, claim by claim:
 
+Do this by listing, then checking — not by re-reading and trusting the re-read. Sweep the finished
+draft once for each kind of claim below, write down every instance you find, and clear the list one
+entry at a time. The failures that survive a verification pass are almost never the claim you
+doubted; they are the one you never put on the list.
+
 Check each claim at the span it covers, not at the span you happened to read:
 
 - a claim about **one place** — the anchor resolves to that file and line, and that place says what
