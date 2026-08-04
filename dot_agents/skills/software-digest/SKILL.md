@@ -134,6 +134,9 @@ asked. Re-open the source and confirm, claim by claim:
 - every edge in every diagram corresponds to a real call, import, or data path;
 - every claim marked `stated` traces to the source that states it, and every inference is marked as
   one;
+- every claim that something is *absent* — not in the source, not recorded, to be looked up
+  elsewhere — was searched for before it was written. An absence inferred from where you expected the
+  answer to live, rather than established by looking, sends the reader out of a source that held it;
 - every place you compressed still holds true with the box opened.
 
 Fix what fails. Where you cannot confirm something, mark it as inference or leave it out.
