@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>bubbletea PR #1691 정리</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+<style>
+  body { font-family: sans-serif; max-width: 800px; margin: 0 auto; }
+  .file { border: 1px solid #ddd; padding: 12px; margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<h1>bubbletea PR #1691 정리</h1>
+
+<p>이 PR은 데이터 레이스를 고쳤다. 아래에 변경된 파일을 하나씩 정리했다. 전체적으로 접근이
+아주 깔끔하고, 이 정도면 머지해도 문제없어 보인다.</p>
+
+<h2>변경된 파일 목록</h2>
+
+<div class="file">
+  <h3>1. <code class="anchor" data-path="renderer/cursed.go" data-line="88">renderer/cursed.go:88</code></h3>
+  <p>렌더러 파일이 수정되었다. 뮤텍스 관련 처리가 추가되었다.</p>
+</div>
+
+<div class="file">
+  <h3>2. <code class="anchor" data-path="tea.go" data-line="99999">tea.go:99999</code></h3>
+  <p>메인 파일도 함께 수정되었다. 테스트 관련 변경이 포함되어 있다.</p>
+</div>
+
+<div class="file">
+  <h3>3. <code class="anchor" data-path="internal/does-not-exist.go" data-line="12">internal/does-not-exist.go:12</code></h3>
+  <p>헬퍼가 추가되었다.</p>
+</div>
+
+<div class="file">
+  <h3>4. <code class="anchor" data-path="Taskfile.yaml" data-line="1">Taskfile.yaml:1</code></h3>
+  <p>태스크 설정이 바뀌었다.</p>
+</div>
+
+<h2>구조</h2>
+
+<figure>
+  <svg viewBox="0 0 400 120" width="400" height="120">
+    <rect x="20" y="30" width="120" height="50" rx="6" fill="#eee" stroke="#999"/>
+    <text x="80" y="60" text-anchor="middle" font-size="13">Renderer</text>
+    <rect x="240" y="30" width="120" height="50" rx="6" fill="#eee" stroke="#999"/>
+    <text x="300" y="60" text-anchor="middle" font-size="13">Handler</text>
+    <line x1="140" y1="55" x2="240" y2="55" stroke="#999" stroke-width="2"/>
+  </svg>
+  <figcaption>렌더러와 핸들러의 관계도</figcaption>
+</figure>
+
+<h2>결론</h2>
+
+<p>동시성 처리가 올바르게 되어 있으며, 락을 잡는 방식이 적절하다. 코드 품질도 좋은 편이라
+별다른 지적 사항은 없을 것으로 보인다.</p>
+
+</body>
+</html>
