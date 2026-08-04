@@ -131,7 +131,7 @@ different fixtures. Grinding further would be sampling that variance, not closin
 risk of "fixing" non-systematic one-offs is a skill that grows louder and worse, which the
 prompt-engineering evidence warns against directly.
 
-This is the point to hand to the human reviewer (hardness L5), which the design named as the final
+The compression-check sharpening (`e32634e`) is itself untested; matrix 4 runs it before any call is made.
 gate all along. The loop bought what a loop can buy: three diagnosed and closed defect classes, and
 an artifact that passes 52 of the last 54 item-judgements.
 
