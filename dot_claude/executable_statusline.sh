@@ -124,12 +124,13 @@ fi
 if [ -e "${cwd}/.git" ] || [ -e "${project_dir}/.git" ]; then
     gitdir="${cwd}"
     [ -e "${project_dir}/.git" ] && gitdir="${project_dir}"
-    # Linked worktree (left of branch): admin name from <repo>/.git/worktrees/<name>.
-    # Main worktree has no /worktrees/ segment, so this shows only when relevant.
+    # Linked-worktree flag (left of branch): the git dir of a linked worktree is
+    # <repo>/.git/worktrees/<name>. The main worktree has no /worktrees/ segment,
+    # so this shows only when relevant. The name itself adds nothing over the
+    # branch, so flag the fact and stop there.
     gd=$(git -C "$gitdir" rev-parse --absolute-git-dir 2>/dev/null)
     case "$gd" in
-        */worktrees/*) wt="${gd##*/worktrees/}"; wt="${wt%%/*}"
-                       line1+="${S}${C}wt:${wt}${R}" ;;
+        */worktrees/*) line1+="${S}${C}worktree${R}" ;;
     esac
     if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
         # Truncate branch name if > 30 chars
