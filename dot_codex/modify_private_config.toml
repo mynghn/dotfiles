@@ -1,13 +1,24 @@
 #!/bin/sh
 set -eu
 
-input=$(cat || true)
+# Mirror the live file's trailing-newline shape instead of forcing one. awk always
+# terminates its last line; the ZeroOps installer appends its block WITHOUT one.
+# Neither tool owns the tail for good — ZeroOps stamps the current end of file,
+# but a new Codex [projects."..."] trust entry appends after it and terminates —
+# so any fixed choice here becomes 1-byte cosmetic drift the moment the other
+# writes last. The X sentinel is needed because $(cat) alone strips trailing
+# newlines, which is exactly the fact being preserved.
+raw=$(cat; printf X)
+input=${raw%X}
 
-# awk always terminates its last line, but the ZeroOps installer appends its
-# block WITHOUT a trailing newline and owns the tail of this file — so strip the
-# one awk adds (via command substitution) to keep chezmoi's target == the live
-# file instead of drifting by one byte after every ZeroOps rewrite.
-printf '%s' "$(printf '%s\n' "$input" | awk '
+NL='
+'
+case "$input" in
+  *"$NL") trailing_newline=1 ;;
+  *)      trailing_newline=0 ;;
+esac
+
+config=$(printf '%s\n' "$input" | awk '
 BEGIN {
   context7_seen = 0
   skip_status_line_array = 0
@@ -139,4 +150,10 @@ END {
     print "args = [\"-y\", \"@upstash/context7-mcp\"]"
   }
 }
-')"
+')
+
+if [ "$trailing_newline" = 1 ]; then
+  printf '%s\n' "$config"
+else
+  printf '%s' "$config"
+fi
