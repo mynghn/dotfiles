@@ -1,0 +1,5 @@
+# LeanPlan feature artifacts live at the repo root (docs/features/<feature>/).
+# They are per-branch WIP belonging to the feature worktrees, not dotfiles —
+# without this, chezmoi reads them as source state and applies them to ~/docs.
+docs
+docs/**
