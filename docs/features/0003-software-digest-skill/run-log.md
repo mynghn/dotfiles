@@ -90,6 +90,51 @@ fixture to yet another one-off `basis-honest` claim, the evidence points at the 
 defect-free digest-judgements) exceeding what this artifact class reaches, not at a fixable gap —
 that is a call for the human reviewer, not another loop iteration.
 
+## Matrix 3 — skill @`c52a1f4`
+
+L1/L2 **57 PASS / 0 FAIL**. Judges: s1 **9/9**, s2 **8/9 FAIL**, s3 **9/9**.
+
+The enumeration rule works: s3's runner caught, in its own draft, that "`middleware=` 다섯 군데"
+silently omitted `WebSocketRoute` — the exact defect class that failed s1 in matrix 2 — and s2's
+runner withdrew a file-count claim rather than publish a number inflated by the harness's
+`.materialized` marker. s1 and s3, the two fixtures that had failed earlier matrices, both pass.
+
+- **s2 — FAIL (8/9), `fidelity`.** §5's compressed line says the three merge scripts share three
+  idioms including trailing-newline mimicry and empty-input defence; `modify_AGENTS.md` has neither,
+  **and the digest's own collapsed box says so**. The summary is refuted by its own detail.
+
+This one is different in kind from the first three: **the rule already existed** ("every claim at the
+current level stays true when the box is opened"). It is a compliance miss, not a gap, so there is no
+new rule to add — only a sharpening of the check from an abstract test into a concrete action
+(re-read each deferred box against the sentence that introduces it), applied in the next commit.
+Repeating an existing rule louder is not a fix.
+
+## Where this stands
+
+| | s1 | s2 | s3 | failing item |
+|---|---|---|---|---|
+| Matrix 0 | 9/9 | 9/9 | **8/9** | basis-honest — absence claim |
+| Matrix 1 | 9/9 | 9/9 | **7/9** | basis-honest — scoped absence · anchors — symbol |
+| Matrix 2 | **8/9** | 9/9 | 9/9 | basis-honest — enumeration completeness |
+| Matrix 3 | 9/9 | **8/9** | 9/9 | fidelity — summary vs. its own detail |
+
+Four matrices, each losing exactly one item out of twenty-seven. Three of the four causes were real
+rule gaps; each was closed, and each closure held — the class never recurred, and runners now catch
+it in their own drafts before a judge sees it. Every fixture that failed has since passed. The fourth
+was not a gap.
+
+**The terminal condition is not converging, and the reason is not a standing defect.** Two
+consecutive clean matrices means six consecutive defect-free digest-judgements, where each digest
+makes 50–100 individually checkable claims and a strict judge audits them against the source. The
+observed rate is roughly one slipped claim per matrix, scattered across different dimensions and
+different fixtures. Grinding further would be sampling that variance, not closing gaps — and the
+risk of "fixing" non-systematic one-offs is a skill that grows louder and worse, which the
+prompt-engineering evidence warns against directly.
+
+This is the point to hand to the human reviewer (hardness L5), which the design named as the final
+gate all along. The loop bought what a loop can buy: three diagnosed and closed defect classes, and
+an artifact that passes 52 of the last 54 item-judgements.
+
 ## Carried forward (for L5 review, not blocking)
 
 - **Self-referential counts.** The quantity rule says "recomputed from the source"; a count of the

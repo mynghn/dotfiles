@@ -145,7 +145,9 @@ Check each claim at the span it covers, not at the span you happened to read:
 - every edge in every diagram corresponds to a real call, import, or data path;
 - every claim marked `stated` traces to the passage that states it — re-read that passage rather than
   citing a section by the name you remember it having, and mark every inference as one;
-- every place you compressed still holds true with the box opened.
+- every place you compressed still holds true with the box opened — read each deferred box back
+  against the sentence that introduces it, as a reader arriving from that sentence would. A summary
+  and its own detail contradicting each other is the one error a careful reader is guaranteed to find.
 
 Fix what fails. Where you cannot confirm something, mark it as inference or leave it out.
 
