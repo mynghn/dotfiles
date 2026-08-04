@@ -61,10 +61,34 @@ about background-task durability", "…doesn't mention request-ID middleware") b
 `@property` decorator lines or an off-by-one signature line, moved onto the symbols they claimed. Its
 words: both negatives "were found only because the skill requires searching before writing an edge."
 
-- **s1 — rerunning** (first attempt lost to a connection failure mid-write, not a skill fault;
-  fixture verified clean at `c60f0c5` afterwards)
-- **s2 — pending**
-- **s3 — digest written**, 79 anchors, 8 sections, 2 figures, 5 self-check questions
+L1/L2 **57 PASS / 0 FAIL**. Judges: s1 **8/9 FAIL**, s2 **9/9**, s3 **9/9**.
+
+- **s3 — PASS (9/9).** The fixture that failed the previous two matrices. The judge verified the
+  whole-source quantifications by grep (`starlette.exception_handlers` written once, read once;
+  `wrap_app_handling_exceptions` called at exactly three sites) and checked 30+ anchors against their
+  enclosing symbols. The span rule did its job where it was aimed.
+- **s2 — PASS (9/9).** Quantities re-derived to the byte (OWNED = 600/450/411/293/234 = 1,988, slack
+  12); universals held under search.
+- **s1 — FAIL (8/9), `basis-honest`.** "이 필드를 읽는 세 곳 (start, flush, onMouse)", badged
+  `verified` — `close()` reads it too at `cursed_renderer.go:151`, so there are four. The span rule
+  listed negative triggers and missed the positive form: an enumeration asserts completeness with no
+  negative word in it. → generalized in `c52a1f4`.
+
+### The shape of the failures so far
+
+| | s1 | s2 | s3 |
+|---|---|---|---|
+| Matrix 0 | 9/9 | 9/9 | **8/9** |
+| Matrix 1 | 9/9 | 9/9 | **7/9** |
+| Matrix 2 | **8/9** | 9/9 | 9/9 |
+
+Every matrix loses exactly one fixture, always on `basis-honest`, always on a different specific
+claim — and every diagnosed class has stayed dead once fixed (s3's recovery is the clearest case).
+That is the signature of a strict judge auditing 30–80 verifiable claims per digest and finding the
+one that slipped, rather than of a skill with a standing defect. Worth watching: if matrix 3 loses a
+fixture to yet another one-off `basis-honest` claim, the evidence points at the bar (six consecutive
+defect-free digest-judgements) exceeding what this artifact class reaches, not at a fixable gap —
+that is a call for the human reviewer, not another loop iteration.
 
 ## Carried forward (for L5 review, not blocking)
 
