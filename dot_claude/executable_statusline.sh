@@ -120,23 +120,23 @@ if [ -n "$cwd" ] && [ "$cwd" != "$project_dir" ]; then
     line1+="${S}${C}cwd:$(abbrev_dir "$cwd")${R}"
 fi
 
-# Git worktree + branch. Use -e (not -d): a linked worktree's .git is a FILE.
+# Git branch + worktree flag. Use -e (not -d): a linked worktree's .git is a FILE.
 if [ -e "${cwd}/.git" ] || [ -e "${project_dir}/.git" ]; then
     gitdir="${cwd}"
     [ -e "${project_dir}/.git" ] && gitdir="${project_dir}"
-    # Linked-worktree flag (left of branch): the git dir of a linked worktree is
-    # <repo>/.git/worktrees/<name>. The main worktree has no /worktrees/ segment,
-    # so this shows only when relevant. The name itself adds nothing over the
-    # branch, so flag the fact and stop there.
-    gd=$(git -C "$gitdir" rev-parse --absolute-git-dir 2>/dev/null)
-    case "$gd" in
-        */worktrees/*) line1+="${S}${C}worktree${R}" ;;
-    esac
     if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
         # Truncate branch name if > 30 chars
         [ ${#branch} -gt 30 ] && branch="${branch:0:29}…"
         line1+="${S}${C}branch:${branch}${R}"
     fi
+    # Linked-worktree flag (right of branch): the git dir of a linked worktree is
+    # <repo>/.git/worktrees/<name>. The main worktree has no /worktrees/ segment,
+    # so this shows only when relevant. The name itself adds nothing over the
+    # branch, so flag the fact and stop there.
+    gd=$(git -C "$gitdir" rev-parse --absolute-git-dir 2>/dev/null)
+    case "$gd" in
+        */worktrees/*) line1+="${S}${C}in worktree${R}" ;;
+    esac
 fi
 
 # Model
