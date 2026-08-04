@@ -1,15 +1,28 @@
 #!/bin/sh
 
 
-input=$(cat)
+# Mirror the live file's trailing-newline shape instead of forcing one. jq always
+# appends a newline and Claude Code rewrites this file with EITHER shape, so any
+# fixed choice here shows up as perpetual 1-byte cosmetic drift in chezmoi
+# status. The X sentinel is needed because $(cat) alone strips trailing newlines,
+# which is exactly the fact being preserved.
+raw=$(cat; printf X)
+input=${raw%X}
 
-if [ -z "$input" ]; then
-  input='{}'
-fi
+NL='
+'
+case "$input" in
+  *"$NL") trailing_newline=1 ;;
+  *)      trailing_newline=0 ;;
+esac
 
-# jq always appends a trailing newline; Claude Code writes settings.json WITHOUT
-# one, so emit no trailing newline to keep chezmoi's target == the live file.
-printf '%s' "$(echo "$input" | jq '
+# Blank or whitespace-only input (fresh machine) is not valid JSON for jq.
+case "$input" in
+  *[![:space:]]*) ;;
+  *) input='{}' ;;
+esac
+
+settings=$(printf '%s' "$input" | jq '
   .statusLine = {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -21,7 +34,11 @@ printf '%s' "$(echo "$input" | jq '
   # Measured on v2.1.117; no cache-prefix invalidation observed.
   .includeGitInstructions = false |
   .enabledPlugins = ((.enabledPlugins // {}) | with_entries(select(.key | endswith("@Mixedbread-Grep") | not))) |
-  .hooks.PreToolUse = [{
+  # chezmoi owns only the entries pointing at its own ~/.claude/hooks/ scripts.
+  # Anything else in the live file was injected by another tool (Orca
+  # agent-hooks, for one) and is carried through untouched rather than clobbered
+  # — an unrecognized entry is always preserved, never dropped.
+  .hooks.PreToolUse = ([{
     "matcher": "Edit|Write|MultiEdit",
     "hooks": [{"type": "command", "command": "~/.claude/hooks/chezmoi-guard.sh"}]
   }, {
@@ -30,5 +47,14 @@ printf '%s' "$(echo "$input" | jq '
   }, {
     "matcher": "mcp__plugin_github_github__(add_issue_comment|add_comment_to_pending_review|add_reply_to_pull_request_comment|pull_request_review_write)",
     "hooks": [{"type": "command", "command": "~/.claude/hooks/gh-comment-attribution.sh", "statusMessage": "Checking GitHub comment attribution..."}]
-  }]
-')"
+  }] + [
+    (.hooks.PreToolUse // [])[]
+    | select([(.hooks // [])[] | .command // "" | contains(".claude/hooks/")] | any | not)
+  ])
+')
+
+if [ "$trailing_newline" = 1 ]; then
+  printf '%s\n' "$settings"
+else
+  printf '%s' "$settings"
+fi
