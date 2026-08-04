@@ -120,10 +120,17 @@ if [ -n "$cwd" ] && [ "$cwd" != "$project_dir" ]; then
     line1+="${S}${C}cwd:$(abbrev_dir "$cwd")${R}"
 fi
 
-# Git branch + worktree flag. Use -e (not -d): a linked worktree's .git is a FILE.
-if [ -e "${cwd}/.git" ] || [ -e "${project_dir}/.git" ]; then
-    gitdir="${cwd}"
-    [ -e "${project_dir}/.git" ] && gitdir="${project_dir}"
+# Git branch + worktree flag. Resolve via rev-parse rather than testing for a
+# .git entry: it walks UP from a subdirectory (a session launched below the repo
+# root still reports, which a -e test misses) and needs no special case for a
+# linked worktree's .git being a FILE. cwd first, workspace as the fallback for
+# when the live dir has drifted outside the repo.
+gitdir=""; gd=""
+for d in "$cwd" "$project_dir"; do
+    [ -n "$d" ] || continue
+    if gd=$(git -C "$d" rev-parse --absolute-git-dir 2>/dev/null); then gitdir="$d"; break; fi
+done
+if [ -n "$gitdir" ]; then
     if branch=$(git -C "$gitdir" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null); then
         # Truncate branch name if > 30 chars
         [ ${#branch} -gt 30 ] && branch="${branch:0:29}…"
@@ -133,7 +140,6 @@ if [ -e "${cwd}/.git" ] || [ -e "${project_dir}/.git" ]; then
     # <repo>/.git/worktrees/<name>. The main worktree has no /worktrees/ segment,
     # so this shows only when relevant. The name itself adds nothing over the
     # branch, so flag the fact and stop there.
-    gd=$(git -C "$gitdir" rev-parse --absolute-git-dir 2>/dev/null)
     case "$gd" in
         */worktrees/*) line1+="${S}${C}in worktree${R}" ;;
     esac
