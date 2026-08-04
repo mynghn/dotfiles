@@ -127,16 +127,22 @@ Group by what the work is trying to accomplish, and let the files fall where the
 A wrong map is worse than no map, because the reader cannot check it — that is precisely why they
 asked. Re-open the source and confirm, claim by claim:
 
-- every anchor resolves to that file and line, and that place says what you claim it says;
+Check each claim at the span it covers, not at the span you happened to read:
+
+- a claim about **one place** — the anchor resolves to that file and line, and that place says what
+  you claim. When you name the symbol it belongs to, confirm that symbol's own boundaries enclose the
+  line: a line sitting in a neighbouring helper or class reads as confirmation while saying something
+  else;
+- a claim about **the whole source** — "only here", "nowhere else", "not in this repository", "the
+  only place that" — is settled by an exhaustive search before it is written, documentation included.
+  Scope taken from where you expected the answer to live, rather than from looking, sends the reader
+  away from a source that held it;
 - every quantity — a count of files, a number of lines, a size, a range — was recomputed from the
   source as you wrote it. A number carried over from earlier reading is the easiest thing in a digest
   to get wrong and the hardest for a reader to think to doubt;
 - every edge in every diagram corresponds to a real call, import, or data path;
-- every claim marked `stated` traces to the source that states it, and every inference is marked as
-  one;
-- every claim that something is *absent* — not in the source, not recorded, to be looked up
-  elsewhere — was searched for before it was written. An absence inferred from where you expected the
-  answer to live, rather than established by looking, sends the reader out of a source that held it;
+- every claim marked `stated` traces to the passage that states it — re-read that passage rather than
+  citing a section by the name you remember it having, and mark every inference as one;
 - every place you compressed still holds true with the box opened.
 
 Fix what fails. Where you cannot confirm something, mark it as inference or leave it out.

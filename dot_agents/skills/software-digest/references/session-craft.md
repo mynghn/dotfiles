@@ -83,7 +83,9 @@ of three states, and none are left floating:
 This is also where inaccessible sources land: a private ticket you could not open, history that was
 squashed, a subsystem outside the budget. Naming the edge of the map is part of drawing it honestly.
 
-Draw that edge by looking, never by expecting. Before writing that something is not in the source,
-search the source for it — including its documentation, which is where a project most often answers
-the question you assumed only its dependency could. An edge drawn in the wrong place is worse than no
-edge: it sends the reader away from an answer that was sitting there.
+Draw that edge by looking, never by expecting. Before writing that something is not in the source —
+or the narrower version, that it appears *only* in one form, in one place, for one purpose — search
+the source for it, documentation included. Documentation is where a project most often answers the
+question you assumed only its dependency could, and it is the half of a repository that a reader of
+the code alone forgets to search. An edge drawn in the wrong place is worse than no edge: it sends
+the reader away from an answer that was sitting there.
