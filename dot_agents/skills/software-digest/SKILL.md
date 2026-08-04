@@ -128,6 +128,9 @@ A wrong map is worse than no map, because the reader cannot check it — that is
 asked. Re-open the source and confirm, claim by claim:
 
 - every anchor resolves to that file and line, and that place says what you claim it says;
+- every quantity — a count of files, a number of lines, a size, a range — was recomputed from the
+  source as you wrote it. A number carried over from earlier reading is the easiest thing in a digest
+  to get wrong and the hardest for a reader to think to doubt;
 - every edge in every diagram corresponds to a real call, import, or data path;
 - every claim marked `stated` traces to the source that states it, and every inference is marked as
   one;
