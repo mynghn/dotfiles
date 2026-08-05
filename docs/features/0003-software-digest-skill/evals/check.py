@@ -11,9 +11,12 @@ import os
 import re
 import sys
 
-SKILL_DIR = "dot_agents/skills/software-digest"
-SYMLINK = "dot_claude/skills/symlink_software-digest"
-SYMLINK_TARGET = "../../.agents/skills/software-digest"
+# Skill under test. Override with SD_SKILL to point the same harness at a
+# sibling implementation (e.g. SD_SKILL=software-digest-ko).
+SKILL_NAME = os.environ.get("SD_SKILL", "software-digest")
+SKILL_DIR = f"dot_agents/skills/{SKILL_NAME}"
+SYMLINK = f"dot_claude/skills/symlink_{SKILL_NAME}"
+SYMLINK_TARGET = f"../../.agents/skills/{SKILL_NAME}"
 
 # scenario id -> (fixture subdir under cache, human label)
 SCENARIOS = {
@@ -66,7 +69,7 @@ def check_skill(root):
     front, body = fm.group(1), fm.group(2)
 
     name = re.search(r"^name:\s*(\S+)\s*$", front, flags=re.M)
-    check(scope, "name-matches-dir", bool(name) and name.group(1) == "software-digest",
+    check(scope, "name-matches-dir", bool(name) and name.group(1) == SKILL_NAME,
           name.group(1) if name else "missing")
 
     desc = re.search(r'^description:\s*"(.*?)"\s*$', front, flags=re.M | re.S)
