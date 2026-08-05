@@ -26,6 +26,13 @@ Facts come from the artifact; only decisions come from the person. Establish fro
   input is however many pieces carry it — several pull requests, several repositories, or both. A
   system that spans a service, its charts, and its infrastructure is one subject, not three. Fix what
   the subject is first, then treat every piece as evidence about it.
+- **Which state.** A repository is not yet a subject — a repository *at a state* is. Take the
+  checked-out state of a local checkout, or the default branch of a remote, and name what you took
+  in one line so it can be corrected. This is a default to assert, not a question to ask. Work that
+  has not landed — open pull requests, drafts, unmerged branches — is outside the subject by default,
+  because a digest describes what exists and mixing in what is merely proposed describes a system
+  that runs nowhere. When the reader wants proposed work understood, they name it as input, and it
+  becomes a change on this ground.
 - **Its shape.** A *change* (a pull request, a set of them, a diff or commit range): the subject is
   the delta — the prior state, what moved, how far the effect reaches. A *system* (a repository, a set
   of them, a service and everything that deploys it): the subject is the whole — what it is, what it
@@ -193,9 +200,14 @@ Four markup hooks are exact, because a reader and a checker both rely on them.
 ```html
 <section class="reader-contract">
   … who this is for and what they want from it · what it assumes is already known ·
-  the reading budget · what it covers, and what it leaves out …
+  the reading budget · what it covers, and what it leaves out ·
+  the exact state described: each repository, its branch, its commit …
 </section>
 ```
+
+Pin the state. A digest that does not say which commit it read goes stale silently — months later it
+still reads as authoritative about a system that may no longer be shaped that way, and the reader has
+no way to notice.
 
 **Code anchors** — every reference to a specific place in the code:
 
