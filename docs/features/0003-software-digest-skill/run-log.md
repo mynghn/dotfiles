@@ -190,13 +190,23 @@ five times running, and 52 of the last 54 L4 item-judgements passing.
 - **Self-referential counts.** The quantity rule says "recomputed from the source"; a count of the
   digest's *own* parts (the "세 문제" slip) sits just outside that wording. One cosmetic instance so
   far — not the systematic pattern that justified the previous two fixes. Watch for recurrence.
-- **Multi-repo ordered PR bundles are untested.** A real target — NEWCS-3868, 12 PRs across 12
-  repositories in 5 ordered rollout groups, with intent living in a Jira ticket and a Slack message
-  rather than in any repository — is a harder input shape than any pinned fixture, which tops out at
-  a single PR. For work like that the cross-repo rollout order *is* the architecture, and per-PR
-  detail has to stay subordinate to the bundle's story. The frozen harness cannot test this. The
-  honest next step is to run the real case once v1 is settled and write v1.1 guidance from what that
-  run shows, rather than adding unverifiable guidance now.
+- **Bundle input is now in the skill, and is untested.** A correction from the author closed a real
+  gap: "single subject" was always about the *subject* — one system or one piece of work — never about
+  the input arriving in one piece. A system routinely spans a service, its charts, and its
+  infrastructure. The description said "set of PRs" but the body framed every input in the singular,
+  and the anchor contract had no way to say *which* repository a path belonged to.
+
+  Changed: step 1 separates the subject from the pieces it arrived in; step 3 makes the relationships
+  between pieces part of the subject (ordering across repositories *is* the architecture, and it is
+  written in none of them; the uniting intent usually lives outside all of them, in a ticket or a
+  message); step 4 extends organize-by-intent to "not by repository either"; the output contract adds
+  `data-repo`, required whenever the subject spans more than one repository, because a
+  repository-relative path is not unique across a bundle.
+
+  **No fixture exercises this.** The pinned set tops out at a single PR and a single repository, and
+  `check.py` resolves anchors against one fixture root, so it cannot yet verify `data-repo`. The real
+  target — NEWCS-3868, 12 PRs across 12 repositories in 5 ordered rollout groups — is the natural
+  first exercise, and a bundle fixture plus `data-repo` resolution is the natural next harness change.
 - **Access.** `socar-inc` repositories do not resolve for the active `socar-nio` token despite `repo`
   and `admin:org` scopes, and `user/orgs` is empty — the signature of a missing SAML SSO grant.
   `gh auth refresh -h github.com -s repo` and authorizing the org unblocks both real targets.

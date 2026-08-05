@@ -1,7 +1,7 @@
 ---
 name: software-digest
-description: "Produces a single self-contained HTML digest that makes a completed piece of software work fast and accurately understandable, and runs the short understanding session around it: a brief elicitation of the reader's purpose, prior knowledge, and reading budget before writing, then self-check prompts after. Takes delivered work as input — a pull request or set of PRs, a repository or checkout, a diff or commit range, an issue or ticket carrying the work's context, or any mix. Use when completed work is handed over to be understood: reviewing a colleague's finished PR, onboarding to an unfamiliar service, picking up a handoff, or sizing up an open-source project before adopting it; and on requests like digest this PR, understand this repo, walk me through this codebase, get me up to speed, or what does this change actually do. For explaining one already-identified concept, or a quick answer about a single known function, answer directly instead."
-argument-hint: "[PR link | repo path | diff range | issue key] [what you need it for]"
+description: "Produces a single self-contained HTML digest that makes a completed piece of software work fast and accurately understandable, and runs the short understanding session around it: a brief elicitation of the reader's purpose, prior knowledge, and reading budget before writing, then self-check prompts after. Takes delivered work as input — one or more pull requests, one or more repositories, a diff or commit range, an issue or ticket carrying the work's context, or any mix; work spanning several repositories is one subject, not several. Use when completed work is handed over to be understood: reviewing a colleague's finished change, onboarding to an unfamiliar service, picking up a handoff, or sizing up an open-source project before adopting it; and on requests like digest these PRs, understand this repo, walk me through this codebase, get me up to speed, or what does this change actually do. For explaining one already-identified concept, or a quick answer about a single known function, answer directly instead."
+argument-hint: "[PR link(s) | repo path(s) | diff range | issue key] [what you need it for]"
 ---
 
 # software-digest
@@ -22,10 +22,14 @@ Every step below serves those three. They are also what the digest's own self-ch
 
 Facts come from the artifact; only decisions come from the person. Establish from the source first:
 
-- **Input shape.** A *change* (pull request, diff, commit range): the subject is the delta — the prior
-  state, what moved, and how far the effect reaches. A *system* (repository, checkout, service): the
-  subject is the whole — what it is, what it does, how it is shaped. Given both, the system is the
-  ground and the change is the figure on it.
+- **The subject, and the pieces it arrived in.** The subject is one system or one piece of work; the
+  input is however many pieces carry it — several pull requests, several repositories, or both. A
+  system that spans a service, its charts, and its infrastructure is one subject, not three. Fix what
+  the subject is first, then treat every piece as evidence about it.
+- **Its shape.** A *change* (a pull request, a set of them, a diff or commit range): the subject is
+  the delta — the prior state, what moved, how far the effect reaches. A *system* (a repository, a set
+  of them, a service and everything that deploys it): the subject is the whole — what it is, what it
+  does, how it is shaped. Given both, the system is the ground and the change is the figure on it.
 - **The written record.** Descriptions, linked issues or tickets, commit messages, design notes,
   README, tests. These carry intent, which code cannot show.
 - **What you cannot reach** — a private link, missing history, a codebase too large to read whole.
@@ -74,6 +78,14 @@ next a place to attach:
 the load (break it and the thing breaks), what is routine and safely skimmed, and what is
 deliberately unusual and therefore surprising.
 
+**When the subject arrived in pieces, the relationships between them are part of the subject.** What
+must land before what, which piece depends on which, which one carries the behavior while another
+only carries configuration — for work spread across repositories that ordering *is* the architecture,
+and it is written down in none of the pieces. The intent that unites them usually lives outside all of
+them too, in a ticket or a message; that is where the first layer comes from. Weight each piece by
+what it contributes to the whole rather than giving each an equal turn. And a piece that does not fit
+the story is worth saying so about — either you have misread the work, or something rode along with it.
+
 **Spend the baseline.** The cheapest true explanation names what the reader already knows and
 describes only the departures — "a standard worker queue, with three departures: …". Recognition
 costs a reader far less than construction.
@@ -119,8 +131,10 @@ end-to-end trace of one representative scenario · a dissection of the core mech
 decision points · a dictionary of the local idioms · the fragile assumptions and invariants. Details
 and worked shapes in `references/code-guide-types.md`.
 
-**Organize by intent, not by file.** A reader who wanted a file list would run `git diff --stat`.
-Group by what the work is trying to accomplish, and let the files fall where the intent puts them.
+**Organize by intent, not by file** — and, when the subject spans several, not by repository either.
+A reader who wanted a file list would run `git diff --stat`; one who wanted a list of repositories
+already has the links. Group by what the work is trying to accomplish, and let files and repositories
+fall where the intent puts them.
 
 ## 5. Verify before you deliver
 
@@ -187,10 +201,13 @@ Four markup hooks are exact, because a reader and a checker both rely on them.
 
 ```html
 <code class="anchor" data-path="source/routing.py" data-line="142">source/routing.py:142</code>
+<code class="anchor" data-repo="socar-api" data-path="app/Auth.php" data-line="88">socar-api · app/Auth.php:88</code>
 ```
 
-`data-path` is repository-relative and `data-line` is a line number that exists in the source you
-read. The visible text is yours to choose.
+`data-path` is relative to its repository and `data-line` is a line number that exists in the source
+you read; the visible text is yours to choose. **When the subject spans more than one repository,
+every anchor carries `data-repo`** — a repository-relative path is not unique across a bundle, and an
+anchor the reader cannot resolve to exactly one place has stopped being grounding.
 
 **Basis markers** — on every load-bearing claim that the code alone cannot prove:
 
