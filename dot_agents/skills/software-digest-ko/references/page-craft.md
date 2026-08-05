@@ -64,10 +64,10 @@ SFMono-Regular, Menlo, monospace`는 대상 자신의 어휘(식별자·경로·
   `max-width: 46rem`이면 된다). 한글은 같은 폭에서 30–35자쯤 들어간다.
 - 주장은 본문 잉크로, 캡션·용어 풀이·곁말은 `--muted`로. 이 대비 차이가 곧
   위계다 — 세 번째 굵기는 거의 필요 없다.
-- 테두리와 카드: `1px solid var(--line)`, `border-radius: 10px`, 패딩
+- 테두리와 카드 — `1px solid var(--line)`, `border-radius: 10px`, 패딩
   `1rem 1.2rem`. 배경은 `var(--surface)`로 페이지 배경에서 한 단계만 띄운다.
   꽉 찬 채색은 쓰지 않는다.
-- 비교 그리드: `grid-template-columns: 1fr 1fr`, `680px` 아래에서 `1fr`로 접는다.
+- 비교 그리드 — `grid-template-columns: 1fr 1fr`, `680px` 아래에서 `1fr`로 접는다.
 - 움직임은 로드 시 한 번 드러나는 정도까지만, 그것도
   `@media (prefers-reduced-motion: no-preference)` 안에서.
 - 누를 수 있는 것은 진짜 `<button>`으로 만들고 `:focus-visible` 외곽선을 남긴다.
