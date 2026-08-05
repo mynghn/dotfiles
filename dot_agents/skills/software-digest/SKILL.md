@@ -1,6 +1,6 @@
 ---
 name: software-digest
-description: "Produces a single self-contained HTML digest that makes a completed piece of software work fast and accurately understandable, and runs the short understanding session around it: a brief elicitation of the reader's purpose, prior knowledge, and reading budget before writing, then self-check prompts after. Takes delivered work as input — one or more pull requests, one or more repositories, a diff or commit range, an issue or ticket carrying the work's context, or any mix; work spanning several repositories is one subject, not several. Use when completed work is handed over to be understood: reviewing a colleague's finished change, onboarding to an unfamiliar service, picking up a handoff, or sizing up an open-source project before adopting it; and on requests like digest these PRs, understand this repo, walk me through this codebase, get me up to speed, or what does this change actually do. For explaining one already-identified concept, or a quick answer about a single known function, answer directly instead."
+description: "Produces a single self-contained HTML digest in English that makes a completed piece of software work fast and accurately understandable, and runs the short understanding session around it: a brief elicitation of the reader's purpose, prior knowledge, and reading budget before writing, then self-check prompts after. Takes delivered work as input — one or more pull requests or repositories, a diff or commit range, an issue or ticket carrying the work's context, or any mix; work spanning several repositories is one subject, not several. Use when completed work is handed over to be understood: reviewing a colleague's finished change, onboarding to an unfamiliar service, picking up a handoff, or sizing up an open-source project before adopting it; and on requests like digest these PRs, understand this repo, walk me through this codebase, get me up to speed, or what does this change actually do. For explaining one already-identified concept, or a quick answer about a single known function, answer directly instead."
 argument-hint: "[PR link(s) | repo path(s) | diff range | issue key] [what you need it for]"
 ---
 
@@ -109,8 +109,8 @@ alternatives were live at each decision — the reader forms the judgment.
 
 ## 4. Write the digest
 
-Deliver **one self-contained HTML file**; craft is in `references/page-craft.md`. Write it in the
-language the user is working in.
+Deliver **one self-contained HTML file**; craft is in `references/page-craft.md`. Write it in
+English.
 
 **Derive the structure from this subject.** Before building, ask: *would this same outline, and this
 same palette, fit any other work of this kind?* A yes on either means you have reached for a
