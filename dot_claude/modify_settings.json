@@ -47,6 +47,9 @@ settings=$(printf '%s' "$input" | jq '
   }, {
     "matcher": "mcp__plugin_github_github__(add_issue_comment|add_comment_to_pending_review|add_reply_to_pull_request_comment|pull_request_review_write)",
     "hooks": [{"type": "command", "command": "~/.claude/hooks/gh-comment-attribution.sh", "statusMessage": "Checking GitHub comment attribution..."}]
+  }, {
+    "matcher": "Workflow|Agent",
+    "hooks": [{"type": "command", "command": "~/.claude/hooks/dispatch-model-choice.sh", "statusMessage": "dispatch 배치 확인..."}]
   }] + [
     (.hooks.PreToolUse // [])[]
     | select([(.hooks // [])[] | .command // "" | contains(".claude/hooks/")] | any | not)
