@@ -6,13 +6,24 @@
 #
 # 무엇을 하지 않는가: **판정하지 않는다.** 어떤 배치가 옳은지는 워크로드마다 다르다.
 # 임계값도 처방("이건 sonnet으로")도 두지 않는다 — 고른 값을 사실로 되비출 뿐이다.
-# 경고만 낸다(systemMessage). 차단하지 않는다.
+# 경고만 낸다. 차단하지 않는다 — 사용자에게는 systemMessage로,
+# dispatch를 짜는 모델에게는 hookSpecificOutput.additionalContext로 같은 한 줄을 보낸다.
+# (systemMessage는 사용자 터미널 전용이라 모델에겐 아무것도 남지 않았다.
+#  PreToolUse의 additionalContext는 CC 2.1.266 스키마에 있고 permissionDecision 없이도 전달된다.
+#  permissionDecisionReason은 deny/ask일 때만 살아남으므로 여기선 쓸 수 없다 — 그건 차단이다.)
 set -uo pipefail
 payload="$(cat)"
 tool="$(printf '%s' "$payload" | jq -r '.tool_name // ""')"
 NUDGE='이 워크로드에 맞는 배치인지 확인하라.'
 
-emit() { jq -cn --arg m "$1" '{systemMessage:$m, suppressOutput:true}'; exit 0; }
+emit() {
+  jq -cn --arg m "$1" '{
+    systemMessage: $m,
+    suppressOutput: true,
+    hookSpecificOutput: {hookEventName: "PreToolUse", additionalContext: $m}
+  }'
+  exit 0
+}
 
 # "opus×3, sonnet×1" 꼴로 센다. 값이 없는 호출은 "없음×N".
 tally() { # $1=script  $2=key  $3=총 호출 수
