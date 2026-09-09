@@ -17,6 +17,10 @@
 # comment post is allowed (a missed enforcement beats blocking unrelated work).
 set -uo pipefail
 
+# Temporary kill switch: `touch ~/.claude/hooks/gh-comment-attribution.off`
+# disables enforcement; remove the file to re-enable.
+[ -f "$HOME/.claude/hooks/gh-comment-attribution.off" ] && exit 0
+
 MARKER='claude.com/claude-code'
 
 REASON='이 GitHub 코멘트에 Claude Code 작성 표시가 없습니다. 코멘트 본문 끝에 아래 footer를 추가한 뒤 다시 실행하세요:
