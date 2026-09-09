@@ -36,11 +36,15 @@ deny() {
 
 input=$(cat)
 tool=$(printf '%s' "$input" | jq -r '.tool_name // ""' 2>/dev/null)
+# Match case-insensitively: the server segment of an MCP tool name is the user's
+# own server label, so the same tool arrives as both `plugin_github_github` and
+# `claude_ai_GitHub_MCP`. A case-sensitive glob silently misses the latter.
+tool_lc=$(printf '%s' "$tool" | tr '[:upper:]' '[:lower:]')
 
 # ---------------------------------------------------------------------------
 # Channel 2: GitHub MCP comment/review-write tools. Body lives in .tool_input.body.
 # ---------------------------------------------------------------------------
-case "$tool" in
+case "$tool_lc" in
   mcp__*github*__add_issue_comment \
   | mcp__*github*__add_comment_to_pending_review \
   | mcp__*github*__add_reply_to_pull_request_comment \
