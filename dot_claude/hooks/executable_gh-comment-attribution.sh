@@ -15,6 +15,11 @@
 # On a marker-less comment it denies the call and tells the model to append the
 # footer. Fails open: anything it can't positively classify as a marker-less
 # comment post is allowed (a missed enforcement beats blocking unrelated work).
+#
+# One exemption: comments whose body *begins* with an Atlantis command. Atlantis
+# only parses a comment that is the command and nothing else, so the footer and
+# the command are mutually exclusive -- enforcing here would not add attribution,
+# it would make Atlantis undrivable. See the block below for the measurement.
 set -uo pipefail
 
 # Temporary kill switch: `touch ~/.claude/hooks/gh-comment-attribution.off`
@@ -99,6 +104,49 @@ if printf '%s' "$cmd" | grep -Eq 'gh[[:space:]]+api'; then
 fi
 
 [ "$is_post" -eq 1 ] || exit 0
+
+# ---------------------------------------------------------------------------
+# Exemption: Atlantis command comments.
+#
+# Atlantis parses a PR comment as a command only when the body is the command
+# and nothing else; appending the attribution footer makes the server ignore
+# the comment outright -- no error, no reply, just silence. So the marker and
+# an Atlantis command cannot coexist, and requiring the marker here does not
+# add attribution, it removes the ability to drive Atlantis at all.
+#
+# Measured 2026-09-09 on socar-terraform#1652: `atlantis plan` + footer drew no
+# response for ~15 min; the same command alone, in the same PR, planned four
+# projects within five minutes.
+#
+# Scope is deliberately narrow -- the body must *begin* with `atlantis <verb>`,
+# so prose that merely mentions Atlantis still needs the footer.
+# ---------------------------------------------------------------------------
+atlantis_verbs='(plan|apply|unlock|approve_policies|import|state|version|help)'
+
+# Inline body:  --body 'atlantis plan' | --body="atlantis plan" | -b atlantis\ plan
+if printf '%s' "$cmd" |
+   grep -Eq -- "(--body|-b)[[:space:]=]+[\"']?atlantis[[:space:]]+$atlantis_verbs\b"; then
+  exit 0
+fi
+
+# Body file whose first non-blank line is an Atlantis command.
+atlantis_body_files=$(
+  {
+    printf '%s' "$cmd" | grep -oE '\-\-body-file[ =][^ ]+' | sed -E 's/^--body-file[ =]//'
+    printf '%s' "$cmd" | grep -oE '([[:space:]]|^)-F[[:space:]]+[^ ]+' | sed -E 's/.*-F[[:space:]]+//'
+  } 2>/dev/null | sort -u
+)
+while IFS= read -r f; do
+  [ -n "$f" ] || continue
+  f=${f%\"}; f=${f#\"}; f=${f%\'}; f=${f#\'}
+  [ -f "$f" ] || continue
+  if awk 'NF { print; exit }' "$f" 2>/dev/null |
+     grep -Eq "^atlantis[[:space:]]+$atlantis_verbs\b"; then
+    exit 0
+  fi
+done <<EOF
+$atlantis_body_files
+EOF
 
 # Marker inline? (covers --body "..." and heredoc bodies, which live in cmd)
 if printf '%s' "$cmd" | grep -qF "$MARKER"; then
