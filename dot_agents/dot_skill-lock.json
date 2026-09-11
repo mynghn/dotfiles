@@ -64,6 +64,15 @@
       "skillFolderHash": "97ca9986da14798c86dbb903996fe2c1113ed9ff",
       "installedAt": "2026-07-10T06:06:37.403Z",
       "updatedAt": "2026-07-10T06:06:37.403Z"
+    },
+    "eli5": {
+      "source": "dreambigou/eli5",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/dreambigou/eli5.git",
+      "skillPath": "skills/eli5/SKILL.md",
+      "skillFolderHash": "743c30702cdbc7fb3f60969de14d00c0eb82d6da",
+      "installedAt": "2026-09-11T08:16:25.656Z",
+      "updatedAt": "2026-09-11T08:16:25.656Z"
     }
   },
   "dismissed": {
