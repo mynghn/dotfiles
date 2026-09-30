@@ -18,20 +18,75 @@ case "$input" in
   *)      trailing_newline=0 ;;
 esac
 
+# Keep the owned tables ahead of other tables, but after TOML root settings.
+# Move whole tables so local keys stay in their original scope. ZeroOps markers
+# belong to its block, even when a table being moved lies between those markers.
 config=$(printf '%s\n' "$input" | awk '
+function emit(part) {
+  sub(/^\n+/, "", part)
+  sub(/\n+$/, "", part)
+  if (part != "") {
+    if (emitted) print ""
+    print part
+    emitted = 1
+  }
+}
+
+/^[[:space:]]*# ZEROOPS-(BEGIN|END)([[:space:]]|$)/ {
+  started_tables = 1
+  parts["rest"] = parts["rest"] $0 "\n"
+  next
+}
+
+/^[[:space:]]*\[[^]]+\][[:space:]]*(#.*)?$/ {
+  started_tables = 1
+  section = $0
+  sub(/^[[:space:]]*\[/, "", section)
+  sub(/\][[:space:]]*(#.*)?$/, "", section)
+  owned = section == "features" || section == "desktop" || section == "memories"
+}
+
+{
+  bucket = owned ? section : (started_tables ? "rest" : "head")
+  parts[bucket] = parts[bucket] $0 "\n"
+}
+
+END {
+  emit(parts["head"])
+  emit(parts["features"] != "" ? parts["features"] : "[features]")
+  emit(parts["desktop"] != "" ? parts["desktop"] : "[desktop]")
+  emit(parts["memories"] != "" ? parts["memories"] : "[memories]")
+  emit(parts["rest"])
+}
+' | awk '
 BEGIN {
-  context7_seen = 0
+  skip_removed_mcp_section = 0
   skip_status_line_array = 0
   previous_blank = 0
   in_section = 0
   in_tui_section = 0
   tui_section_seen = 0
   status_line_printed = 0
+  managed_section = ""
+  skip_reasoning_efforts_array = 0
   print "# chezmoi-managed: portable Codex defaults"
   print "approvals_reviewer = \"auto_review\""
   print ""
   printed_any = 1
   previous_blank = 1
+}
+
+function print_managed_settings(section) {
+  if (section == "features") {
+    print "hooks = true"
+    print "memories = true"
+  } else if (section == "desktop") {
+    print "show-context-window-usage = true"
+    print "enabled-reasoning-efforts = [\"low\", \"medium\", \"high\", \"xhigh\", \"ultra\", \"persistent\", \"max\"]"
+  } else if (section == "memories") {
+    print "generate_memories = true"
+    print "use_memories = true"
+  }
 }
 
 function print_status_line() {
@@ -65,30 +120,71 @@ function print_tui_status_line_if_needed() {
   }
 }
 
-/^[[:space:]]*\[[^]]+\][[:space:]]*$/ {
+/^[[:space:]]*\[[^]]+\][[:space:]]*(#.*)?$/ {
   print_tui_status_line_if_needed()
   in_section = 1
   in_tui_section = 0
   status_line_printed = 0
+  managed_section = ""
+  section = $0
+  sub(/^[[:space:]]*\[/, "", section)
+  sub(/\][[:space:]]*(#.*)?$/, "", section)
 
-  # Only context7 EXISTING matters, not where it sits: leave an already-present
-  # section where the live file put it (Codex rewrites this file and reorders
-  # sections) and re-emit it at the end only when it is absent entirely.
-  if ($0 ~ /^[[:space:]]*\[mcp_servers\.context7\][[:space:]]*$/) {
-    context7_seen = 1
+  # Remove retired servers, including nested tables such as their environment.
+  skip_removed_mcp_section = section ~ /^mcp_servers\.(context7|mgrep)(\.|$)/
+  if (skip_removed_mcp_section) {
+    next
   }
 
-  if ($0 ~ /^[[:space:]]*\[tui\][[:space:]]*$/) {
+  if (section == "tui") {
     in_tui_section = 1
     tui_section_seen = 1
   }
   print
+  if (section == "features" || section == "desktop" || section == "memories") {
+    managed_section = section
+    print_managed_settings(section)
+  }
   previous_blank = 0
   printed_any = 1
   next
 }
 
 {
+  if (skip_removed_mcp_section) {
+    next
+  }
+
+  if (skip_reasoning_efforts_array) {
+    array_line = $0
+    sub(/#.*/, "", array_line)
+    if (array_line ~ /\]/) {
+      skip_reasoning_efforts_array = 0
+    }
+    next
+  }
+
+  if (managed_section == "features" && $0 ~ /^[[:space:]]*(hooks|memories)[[:space:]]*=/) {
+    next
+  }
+
+  if (managed_section == "desktop" && $0 ~ /^[[:space:]]*show-context-window-usage[[:space:]]*=/) {
+    next
+  }
+
+  if (managed_section == "desktop" && $0 ~ /^[[:space:]]*enabled-reasoning-efforts[[:space:]]*=/) {
+    array_line = $0
+    sub(/#.*/, "", array_line)
+    if (array_line !~ /\]/) {
+      skip_reasoning_efforts_array = 1
+    }
+    next
+  }
+
+  if (managed_section == "memories" && $0 ~ /^[[:space:]]*(generate_memories|use_memories)[[:space:]]*=/) {
+    next
+  }
+
   if (skip_status_line_array) {
     if ($0 ~ /\]/) {
       skip_status_line_array = 0
@@ -140,15 +236,6 @@ END {
     print_status_line()
   }
 
-  if (!context7_seen) {
-    if (printed_any && !previous_blank) {
-      print ""
-    }
-    print "# chezmoi-managed MCP servers"
-    print "[mcp_servers.context7]"
-    print "command = \"npx\""
-    print "args = [\"-y\", \"@upstash/context7-mcp\"]"
-  }
 }
 ')
 
