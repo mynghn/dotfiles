@@ -8,6 +8,7 @@ eval $(echo "$input" | jq -r '
   "cwd=\(.workspace.current_dir // "" | @sh)",
   "project_dir=\(.workspace.project_dir // "" | @sh)",
   "model=\(.model.display_name // "" | @sh)",
+  "model_id=\(.model.id // "" | @sh)",
   "effort=\(.effort.level // "" | @sh)",
   "context_remaining=\(
     if .context_window.remaining_percentage then
@@ -32,6 +33,27 @@ eval $(echo "$input" | jq -r '
   "cache_create=\(.context_window.current_usage.cache_creation_input_tokens // "" | tostring | @sh)",
   "cost=\(.cost.total_cost_usd // "" | tostring | @sh)"
 ' 2>/dev/null) || { echo "Claude Code"; exit 0; }
+
+# Effective context window: the payload's context_window_size is the model's
+# raw window (200K/1M) and ignores autoCompactWindow, so ctx% would read low
+# right up to an auto-compact. Look the setting up for the live model
+# (modelSettings.<id>, retried without a "[1m]" suffix, then the global key)
+# and, when it is smaller, recompute ctx% against it.
+acw=$(jq -r --arg id "$model_id" --arg base "${model_id%"[1m]"}" '
+  .modelSettings[$id].autoCompactWindow // .modelSettings[$base].autoCompactWindow
+  // .autoCompactWindow // empty' "$HOME/.claude/settings.json" 2>/dev/null)
+acw=${acw%.*}
+if [ "$acw" -gt 0 ] 2>/dev/null; then
+    ws=${win_size%.*}
+    if ! [ "$ws" -gt 0 ] 2>/dev/null || [ "$acw" -lt "$ws" ]; then
+        win_size=$acw
+        it=${in_tok%.*}
+        if [ "$it" -ge 0 ] 2>/dev/null; then
+            u=$((it * 100 / acw)); [ "$u" -gt 100 ] && u=100
+            context_remaining=$((100 - u))
+        fi
+    fi
+fi
 
 # Colors
 R='\033[0m'
