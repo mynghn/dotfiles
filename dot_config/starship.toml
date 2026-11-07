@@ -31,7 +31,7 @@ symbol = " "
 symbol = " "
 
 [directory]
-truncation_symbol = "…/"
+truncation_symbol = ".../"
 read_only = " 󰌾"
 
 [docker_context]
